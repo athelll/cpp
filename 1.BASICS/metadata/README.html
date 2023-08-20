@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="Stylesheet" type="text/css" href="style.css">
+<link rel="alternate" type="application/rss+xml" title="RSS" href="rss.xml">
+<title>README</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+
+<div id="BASICS SYNTAXES IN C++"><h1 id="BASICS SYNTAXES IN C++" class="header"><a href="#BASICS SYNTAXES IN C++">BASICS SYNTAXES IN C++</a></h1></div>
+
+<p>
+<span id="BASICS SYNTAXES IN C++-Author"></span><strong id="Author">Author</strong>: Felix Okoronkwo <br>
+<span id="BASICS SYNTAXES IN C++-Date"></span><strong id="Date">Date</strong>: [19/8/23] <br>
+<span id="BASICS SYNTAXES IN C++-Description"></span><strong id="Description">Description</strong>: This section will be about the basic operations in c++ <br>
+</p>
+
+<div id="BASICS SYNTAXES IN C++-[[STATEMENTS]]"><h3 id="[[STATEMENTS]]" class="header"><a href="#BASICS SYNTAXES IN C++-[[STATEMENTS]]"><a href="STATEMENTS.html">STATEMENTS</a></a></h3></div>
+<dl>
+<dt>defination :</dt>
+<dd>this is the smallest independent unit of computaion in c++</dd>
+</dl>
+
+<pre cpp>
+  // statement in cpp
+  std::cout &lt;&lt; "Hello, World!" &lt;&lt; std::endl;
+</pre>
+
+<p>
+most (but not all) statements in c++ end with a semicolon <code>;</code>.
+</p>
+
+<div id="BASICS SYNTAXES IN C++-[[FUNCTION AND MAIN FUNCTION]]"><h3 id="[[FUNCTION AND MAIN FUNCTION]]" class="header"><a href="#BASICS SYNTAXES IN C++-[[FUNCTION AND MAIN FUNCTION]]"><a href="FUNCTION AND MAIN FUNCTION.html">FUNCTION AND MAIN FUNCTION</a></a></h3></div>
+<dl>
+<dt>defination :</dt>
+<dd>this is a collection of statements that are executed in order sequentially top to bottom.</dd>
+</dl>
+
+<p>
+Every c++ program must have a main function which is the entry point of the program.
+the name of the function is always <span id="BASICS SYNTAXES IN C++-[[FUNCTION AND MAIN FUNCTION]]-main"></span><strong id="main">main</strong>. function perform specific jobs.
+</p>
+
+<pre cpp>
+  #include &lt;iostream&gt;             // preprocessor directive
+
+  int main ()                     // main function
+  {
+    std::cout &lt;&lt; "text";          // statement
+    return 0;                     // return statement.
+  }
+</pre>
+
+<div id="BASICS SYNTAXES IN C++-[[COMMENTS]]"><h3 id="[[COMMENTS]]" class="header"><a href="#BASICS SYNTAXES IN C++-[[COMMENTS]]"><a href="COMMENTS.html">COMMENTS</a></a></h3></div>
+<dl>
+<dt>Single line :</dt>
+<dd><code>// this is a single line comment</code></dd>
+<dt>Multiline :</dt>
+<dd><code>/** multiline comment ** /</code></dd>
+</dl>
+
+<div id="BASICS SYNTAXES IN C++-[[OBJECTS AND VARIABLES]]"><h3 id="[[OBJECTS AND VARIABLES]]" class="header"><a href="#BASICS SYNTAXES IN C++-[[OBJECTS AND VARIABLES]]"><a href="OBJECTS AND VARIABLES.html">OBJECTS AND VARIABLES</a></a></h3></div>
+<p>
+C++ access memory for data manipulation through objects
+</p>
+
+<dl>
+<dt><span id="BASICS SYNTAXES IN C++-[[OBJECTS AND VARIABLES]]-Object"></span><strong id="Object">Object</strong> :</dt>
+<dd>Region of storage usually memory that can store data or a value and has other associated properties.</dd>
+</dl>
+
+<p>
+Objects can be named or anonymous.
+A named object is known as a <span id="BASICS SYNTAXES IN C++-[[OBJECTS AND VARIABLES]]-variable"></span><strong id="variable">variable</strong> and its name its known as an <span id="BASICS SYNTAXES IN C++-[[OBJECTS AND VARIABLES]]-identifier"></span><strong id="identifier">identifier</strong>
+</p>
+
+<div id="BASICS SYNTAXES IN C++-[[VARIABLE INSTANTIATION, DEFINATION, TYPES, ASSIGNMENT AND ASSIGNMENT]]"><h3 id="[[VARIABLE INSTANTIATION, DEFINATION, TYPES, ASSIGNMENT AND ASSIGNMENT]]" class="header"><a href="#BASICS SYNTAXES IN C++-[[VARIABLE INSTANTIATION, DEFINATION, TYPES, ASSIGNMENT AND ASSIGNMENT]]"><a href="VARIABLE INSTANTIATION, DEFINATION, TYPES, ASSIGNMENT AND ASSIGNMENT.html">VARIABLE INSTANTIATION, DEFINATION, TYPES, ASSIGNMENT AND ASSIGNMENT</a></a></h3></div>
+<p>
+c++ is statically typed programing languaage and this means just like in C
+a variable's type must be stated whenever defining a variable/object
+</p>
+
+<pre cpp>
+  int a, b;
+  double index;
+  int c; double h;             // correct but not best practice
+</pre>
+
+<p>
+<span id="BASICS SYNTAXES IN C++-[[VARIABLE INSTANTIATION, DEFINATION, TYPES, ASSIGNMENT AND ASSIGNMENT]]-Instantiation"></span><strong id="Instantiation">Instantiation</strong>:
+at runtime programs are instatiated this is when objects and variables are
+created and assigned a memory address for future manipulation or access.
+variables must be instantiated bfoere the can be used to store values.
+an instatiated object is called an <span id="BASICS SYNTAXES IN C++-[[VARIABLE INSTANTIATION, DEFINATION, TYPES, ASSIGNMENT AND ASSIGNMENT]]-Instance"></span><strong id="Instance">Instance</strong>.
+</p>
+
+<p>
+<span id="BASICS SYNTAXES IN C++-[[VARIABLE INSTANTIATION, DEFINATION, TYPES, ASSIGNMENT AND ASSIGNMENT]]-Datatypes"></span><strong id="Datatypes">Datatypes</strong>:
+datatypes of an obkject or variable must be known at compile time
+and variables onl stored the data of the same datatype as the variable itself,
+as stated above (<span id="BASICS SYNTAXES IN C++-[[VARIABLE INSTANTIATION, DEFINATION, TYPES, ASSIGNMENT AND ASSIGNMENT]]-statically-typed"></span><strong id="statically-typed">statically-typed</strong>).
+</p>
+
+<p>
+<span id="BASICS SYNTAXES IN C++-[[VARIABLE INSTANTIATION, DEFINATION, TYPES, ASSIGNMENT AND ASSIGNMENT]]-Varible structure"></span><strong id="Varible structure">Varible structure</strong>:
+variables possess an <span id="BASICS SYNTAXES IN C++-[[VARIABLE INSTANTIATION, DEFINATION, TYPES, ASSIGNMENT AND ASSIGNMENT]]-identifier"></span><strong id="identifier">identifier</strong>, <span id="BASICS SYNTAXES IN C++-[[VARIABLE INSTANTIATION, DEFINATION, TYPES, ASSIGNMENT AND ASSIGNMENT]]-type"></span><strong id="type">type</strong> and <span id="BASICS SYNTAXES IN C++-[[VARIABLE INSTANTIATION, DEFINATION, TYPES, ASSIGNMENT AND ASSIGNMENT]]-value"></span><strong id="value">value</strong>.
+</p>
+
+<p>
+<span id="BASICS SYNTAXES IN C++-[[VARIABLE INSTANTIATION, DEFINATION, TYPES, ASSIGNMENT AND ASSIGNMENT]]-Variable declaration"></span><strong id="Variable declaration">Variable declaration</strong>:
+telling the compiler that a variable exists without allocating memory for it.
+</p>
+
+<p>
+<span id="BASICS SYNTAXES IN C++-[[VARIABLE INSTANTIATION, DEFINATION, TYPES, ASSIGNMENT AND ASSIGNMENT]]-Variable defination"></span><strong id="Variable defination">Variable defination</strong>:
+telling the compiler that a variable exists and allocating memory for it.
+</p>
+
+<p>
+<span id="BASICS SYNTAXES IN C++-[[VARIABLE INSTANTIATION, DEFINATION, TYPES, ASSIGNMENT AND ASSIGNMENT]]-Variable assignment"></span><strong id="Variable assignment">Variable assignment</strong>:
+cassigning a value for a variable to hold in its storsge after defination.
+</p>
+
+<pre cpp>
+  extern int declared;
+  int defined;
+  defined = 0;                //assigned.
+  defined = 69;               // re-assignment to 69
+</pre>
+
+</body>
+</html>
