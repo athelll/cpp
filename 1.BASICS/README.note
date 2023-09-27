@@ -1,11 +1,9 @@
 = BASICS SYNTAXES IN C++ =
 
-*Author*: Felix Okoronkwo <br>
-*Date*: [19/8/23] <br>
-*Description*: This section will be about the basic operations in c++ <br>
+Author: Felix Okoronkwo
 
-=== [[STATEMENTS]] ===
-defination ::: this is the smallest independent unit of computaion in c++
+[[STATEMENTS]]
+Defination : this is the smallest independent unit of computaion in c++
 
 {{{cpp
   // statement in cpp
@@ -14,8 +12,8 @@ defination ::: this is the smallest independent unit of computaion in c++
 
 most (but not all) statements in c++ end with a semicolon `;`.
 
-=== [[FUNCTION AND MAIN FUNCTION]] ===
-defination ::: this is a collection of statements that are executed in order sequentially top to bottom.
+[[FUNCTION AND MAIN FUNCTION]]
+Defination : this is a collection of statements that are executed in order sequentially top to bottom.
 
 Every c++ program must have a main function which is the entry point of the program.
 the name of the function is always *main*. function perform specific jobs.
@@ -30,19 +28,19 @@ the name of the function is always *main*. function perform specific jobs.
   }
 }}}
 
-=== [[COMMENTS]] ===
-Single line ::: `// this is a single line comment`
-Multiline ::: `/** multiline comment ** /`
+[[COMMENTS]]
+Single line : `// this is a single line comment`
+Multiline : `/** multiline comment ** /`
 
-=== [[OBJECTS AND VARIABLES]] ===
+[[OBJECTS AND VARIABLES]]
 C++ access memory for data manipulation through objects
 
-*Object* ::: Region of storage usually memory that can store data or a value and has other associated properties.
+Object : Region of storage usually memory that can store data or a value and has other associated properties.
 
 Objects can be named or anonymous.
 A named object is known as a *variable* and its name its known as an *identifier*
 
-=== [[VARIABLE INSTANTIATION, DEFINATION, TYPES, ASSIGNMENT AND ASSIGNMENT]] ===
+[[VARIABLE INSTANTIATION, DEFINATION, TYPES, ASSIGNMENT AND ASSIGNMENT]]
 c++ is statically typed programing languaage and this means just like in C
 a variable's type must be stated whenever defining a variable/object
 
@@ -81,3 +79,5 @@ cassigning a value for a variable to hold in its storsge after defination.
   defined = 0;                //assigned.
   defined = 69;               // re-assignment to 69
 }}}
+
+
