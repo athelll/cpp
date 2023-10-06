@@ -1,2 +1,2 @@
-CPP note takings
-source: [[https://www.learncpp.com]]
+CPP note takings <br>
+source: [https://www.learncpp.com](LearnCpp Site)
