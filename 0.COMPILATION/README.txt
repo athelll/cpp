@@ -1,4 +1,6 @@
-[COMPILATION] Author: Felix,  Date: [19/08/23]
+[COMPILATION]
+Author: Felix,  Date: [19/08/23]
+
 In Gcc/G++ compiler there are two compilation mode
 
 1) '-ggdb' : This flag compiles with debugging making the file larger and removes

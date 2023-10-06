@@ -1,6 +1,7 @@
 = BASICS SYNTAXES IN C++ =
-
 Author: Felix Okoronkwo
+
+==Intoduction to the Basics==
 
 [[STATEMENTS]]
 Defination : this is the smallest independent unit of computaion in c++
@@ -14,7 +15,6 @@ most (but not all) statements in c++ end with a semicolon `;`.
 
 [[FUNCTION AND MAIN FUNCTION]]
 Defination : this is a collection of statements that are executed in order sequentially top to bottom.
-
 Every c++ program must have a main function which is the entry point of the program.
 the name of the function is always *main*. function perform specific jobs.
 
@@ -38,9 +38,10 @@ C++ access memory for data manipulation through objects
 Object : Region of storage usually memory that can store data or a value and has other associated properties.
 
 Objects can be named or anonymous.
-A named object is known as a *variable* and its name its known as an *identifier*
+A named object is known as a *variable* and its name its known as an *identifier*.
+In C++ direct memory acces is dicouraged, it should be done indirectly through objects.
 
-[[VARIABLE INSTANTIATION, DEFINATION, TYPES, ASSIGNMENT AND ASSIGNMENT]]
+==VARIABLE INSTANTIATION, DEFINATION, TYPES, ASSIGNMENT AND ASSIGNMENT==
 c++ is statically typed programing languaage and this means just like in C
 a variable's type must be stated whenever defining a variable/object
 
@@ -50,28 +51,28 @@ a variable's type must be stated whenever defining a variable/object
   int c; double h;             // correct but not best practice
 }}}
 
-*Instantiation*:
+[[Instantiation]]
 at runtime programs are instatiated this is when objects and variables are
 created and assigned a memory address for future manipulation or access.
 variables must be instantiated bfoere the can be used to store values.
 an instatiated object is called an *Instance*.
 
-*Datatypes*:
+[[Datatypes]]
 datatypes of an obkject or variable must be known at compile time
 and variables onl stored the data of the same datatype as the variable itself,
 as stated above (*statically-typed*).
 
-*Varible structure*:
+[[Varible structure]]
 variables possess an *identifier*, *type* and *value*.
 
-*Variable declaration*:
+[[Variable declaration]]
 telling the compiler that a variable exists without allocating memory for it.
 
-*Variable defination*:
+[[Variable defination]]
 telling the compiler that a variable exists and allocating memory for it.
 
-*Variable assignment*:
-cassigning a value for a variable to hold in its storsge after defination.
+[[Variable assignment]]
+cassigning a value for a variable to hold in its storage after defination.
 
 {{{cpp
   extern int declared;
@@ -79,5 +80,168 @@ cassigning a value for a variable to hold in its storsge after defination.
   defined = 0;                //assigned.
   defined = 69;               // re-assignment to 69
 }}}
+
+==Variable assignment and Initialization==
+[[Initialization]]
+This is defining a variable then giving it an initial value
+
+{{{cpp
+
+  int a;          // no initializer (default initialization)
+  int b = 7;      // copy initialization
+  int a(5);       // direct initialization
+
+  // List initialization methods
+  int d { 4 };    // direct list initializion
+  int e = { 7 };  // copy list initialization
+  int f {};       // empty list initialization
+
+}}}
+
+[[Default Initialization]]
+When a variable is declared with no initializer it is known as default initialization
+in most cases default initialization leaves the variable with an indeterminate value.
+
+[[Copy Initialization]]
+This was inherited from C (initializing the variable with a `=` to assign the value)
+Copy initialization had fallen out of favout in modern c++, duew to being less efficient than other types of
+initialization but C++17 remedied bulk of those issues, copy initialization is now finding new advocates
+
+[[Direct Initialization]]
+This initialization is provided inside brackets beside the indentifier of the variable
+it was introduced to allow initialization of more complex objects (those with class types)
+One fo the reasons direct initialization has fallen out of favour is because it makes it hard
+to tell functions apart from variables
+
+{{{cpp
+  int x();        // forward declaration of function, x.
+  int x(5);       // direct initialization of varibale x.
+}}}
+
+[[List Initialization]]
+Its a modern way to initialize objects using curly brackets in C++ , ts is also called
+uniform or brace initialization.
+Lit initialization diallows narrowing congversions.
+
+{{{cpp
+  int width { 4.5 };  // since int cannot salfely hold a float an error is thrown using the list initialization
+}}}
+
+Why list initialization intolerance to narrow conversions is relevant is because if the above initialization was
+done woth either direct or copy initializaion the fractional part would be dropped leaving only 4, data type
+narrow conversion would have occured.
+
+Conversions that can ve donw without data loss are allowed though.
+
+[[Best Practice]]
+favoring initialization using braces
+
+==Value Initialization and Zero Initialization==
+when a variable is initialized using list initialization with no value (with brackets), tight there the varibale is initilaized
+ans its initialized either to zero or empty depending on the data type.
+
+{{{cpp
+  int width {};     // list initialization / zero initialization to value 0
+}}}
+
+[[Unused variable initialization]]
+When initializing variables in c++, if that variable is not used the g++ compiler throws an
+`Unused Variable` error this can be bypassed by using an `[[maybe_unused]]` attribute for the variable
+that tells the compiler that this variable might be unused in the runtime of the program
+
+{{{cpp
+  int main ()
+  {
+    [[maybe_unused]] int x { 5 };
+    // uses the unsused variable attribute, therefore no warnings
+    return 0;
+  }
+}}}
+
+==Introduction to iostream: cout, cin, and endl==
+
+[[The Input and Output Library]]
+The `<iostream>` is a part of the c++ standard library that deals with basic input and output
+
+[[std::cout]]
+- its is part of the `<iostream>`
+- it alows us to send data to the console to be printed out, the
+`cout` stands for character output, it is used together with the insertion operator `<<` to send the
+characters ot string to be printed to the console
+- is can also print put numbers not only texts and also the value of variables
+- the `<<` operator is used multiple times for concatenation prniting on the same line
+- `std::cout` is bufferered, it works by allocating memory to hold the data to be
+printed (a buffer) in which more data can be lined up in the buffer and
+perodically its flushed for printing, meaning if for some reasons the program crashes
+before the buffer has the opputunity to be flushed for printing, the data stored
+at the buffer, at that time of execution, will not be printed.
+
+{{{cpp
+  #include <iostream>
+
+  int main()
+  {
+    int x {5};
+    std::cout << "the varibable x is :" << x << "mmhmm..i'll-tellyouwhat"
+  }
+
+  return 0;
+}}}
+
+[[std::endl]]
+this is a variable in the `iostream` header that moves the printing cursor to a
+new line.
+
+- using `std:endl` can be inefficent, it actually does 2 jobs:
+  - moves the cursor the the next line
+  - flushes the `std:cout` buffer, which is not efficient
+- its preferable to use the `\n` charachter when printing on a newline
+
+{{{cpp
+  #include <iostream>
+
+  int main()
+  {
+    std::cout << "Yo this moves to a newline and flushes the buffer" << std::endl;
+    std::cout << "This only moves to a newline \n";
+    return 0;
+  }
+}}}
+
+[[std::cin]]
+This variable in the `iostream` library reads input from the keyboard using the
+extraction opertaor `>>`.
+
+{{{cpp
+  #include <iostream>
+
+  int main()
+  {
+	  std::cout << "input number to print >> ";
+	  int number {};
+	  std::cin >> number;
+	  std::cout << "you entered " << number << "\n";
+	  return 0;
+  }
+}}}
+
+- just as `std::cout` allows multiple outputs, `std::cin` allows multiple input
+- the multiple inputs are sepereated by a space delimeter
+
+{{{cpp
+  #include <iostream>
+
+  int main()
+  {
+    std::cout << "input number to print >> ";
+	  int number {};
+	  int number1 {};
+	  std::cin >> number >> number1;
+	  std::cout << "you entered " << number << "and "<< number1 << "\n";
+	  return 0;
+  }
+}}}
+
+- Note when initializing a variable with `std::cin` if the dataypes of the value and variable dont match `std::cin` will do a zero initialization for integers, dont know what happens to other non number based datatypes
 
 
