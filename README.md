@@ -1,2 +1,3 @@
 CPP note takings <br>
-source: [https://www.learncpp.com](LearnCpp Site)
+source: [LearnCpp Site](https://www.learncpp.com)
+
