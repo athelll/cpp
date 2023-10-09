@@ -166,15 +166,14 @@ The `<iostream>` is a part of the c++ standard library that deals with basic inp
 [[std::cout]]
 - its is part of the `<iostream>`
 - it alows us to send data to the console to be printed out, the
-`cout` stands for character output, it is used together with the insertion operator `<<` to send the
-characters ot string to be printed to the console
-- is can also print put numbers not only texts and also the value of variables
+  `cout` stands for character output, it is used together with the insertion operator `<<` to send the
+  characters ot string to be printed to the console
+- it can also print put numbers not only texts and also the value of variables
 - the `<<` operator is used multiple times for concatenation prniting on the same line
-- `std::cout` is bufferered, it works by allocating memory to hold the data to be
-printed (a buffer) in which more data can be lined up in the buffer and
-perodically its flushed for printing, meaning if for some reasons the program crashes
-before the buffer has the opputunity to be flushed for printing, the data stored
-at the buffer, at that time of execution, will not be printed.
+- `std::cout` is bufferered, it works by allocating memory to hold the data to be printed (a buffer) in which more data
+  can be lined up in the buffer and perodically its flushed for printing, meaning if for some reasons the program crashes
+  before the buffer has the opputunity to be flushed for printing, the data stored
+  at the buffer, at that time of execution, will not be printed.
 
 {{{cpp
   #include <iostream>
@@ -242,6 +241,100 @@ extraction opertaor `>>`.
   }
 }}}
 
-- Note when initializing a variable with `std::cin` if the dataypes of the value and variable dont match `std::cin` will do a zero initialization for integers, dont know what happens to other non number based datatypes
+- Note when initializing a variable with `std::cin` if the dataypes of the value and variable dont match `std::cin` will
+  do a zero initialization for integers, dont know what happens to other non number based datatypes
 
+==Uninitialized variables and undefined Behaviour==
+Unlike other programming languages c/c++ do not initialize most variable to a given value
+such as zero automatically, if a variable is created and a memory address is mapped to it store data it assumes the value of
+whatever garbage value is at that address.
+
+[[Recap]]
+- initialization : giving an object a value at the point of defination
+- Assignment     : the object is given a value at some point beyond defination
+- Unitialized    : the object has not been given a known value yet
+
+[[Undefined Behaviour]]
+These are behaviours that arise from implementing code that its behaviour is not
+decalared, by c++, on what might happen on execution.
+It may execute properly or not or even worse.
+You never know.
+
+Conditions that might lead to `UB`:
+- Accessing Out of Bounds
+- Dereferencing Null or Invalid Pointers
+- Use of Uninitialized Variables
+- Division by Zero
+- Double Deleting or Freeing Memory
+- Modifying String or String Literal
+- Unsequenced Modification and Access
+- Overflowing Signed Integers
+
+[[Implementaion-defined behaviours]]
+This are program implementations that the results depend on the compiler to define,
+differnt compilers produce differnt results
+
+==Keywords and naming identifiers==
+C++ has a set of 92 reserved keywords for its own use.
+
+is also has special identifiers:
+- override
+- final
+- import
+- module
+
+Rules for choosing identifiers:
+- cannot be a keyword
+- can be cimposed or lettersm, numbers and an underscore
+- symbols prohibited
+- must begin with a letter cannot stat with a number
+- C++ is case sensitive `nvalue` diff. from `nValue` and `NVALUE`
+
+[[Best practices for naming indentifier]]
+- Camel-case : `int variableName;`
+- Snake_case : `int variable_name;`
+
+==Whitespace and basic formatting==
+Whitespaces are characters used for formatting purposes in c++ they are , newlines, tabs and space.
+
+- quoted text strings seperated by nothing but whitespaces will be concatenated
+- statements may be splitted over multiple lines
+
+Concatenation example:
+{{{cpp
+int main()
+{
+  std::cin << "This strings will be" "concatenated" "yuuuuuuup"
+}
+}}}
+
+==Introduction to literals and operators==
+Literala are fixed values that are insterted directly into the source code,
+Literals ares also known as constant data because they do not change strings like
+`"hello world"` or fixed numbers like `5` are literals
+
+Data can be both utilized and manipulated through varibles or literals the differnece is that:
+- Literals are fixed when using a literala the compiler calls the binaries that represnet that literal
+  and ustilzesti to run the program, directly
+- In the case of variables the variable is mapped to a specific memory address, in which the value of the
+  literal is then copied to that location, so whenever the data wants to be used the memory address is
+  first addressed to obtain the value stored in it and then, the data is used.
+
+Note:
+- literals values are placed directly into the executable and executables cannot be changed after compilation
+- Variables on the other hand are stored in memonry and can its value can be altered when needed.
+
+[[Opertaors]]
+C++ operators compirises of basic mathematical operators and the syntax regarding how they are used
+is almost if not completely the same in mathematics or C.
+There are also operators without symbols, keyword opertaors e.g `new`, `delete` and `throw`.
+
+Things operators do:
+- some operators return values eg `+`, `-`, `*`, etc.
+- some opertaors meybe return something, they they are primarily used because of their side effects or behaviours
+  eg. `=`, `>>`, `<<`
+- the back an forward shift operators return the `std::cout` IO stream variable that allows printing to the console
+  which allows chaining and print concatenation.
+
+==Introduction to Expressions==
 
