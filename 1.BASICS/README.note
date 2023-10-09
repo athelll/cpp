@@ -337,4 +337,24 @@ Things operators do:
   which allows chaining and print concatenation.
 
 ==Introduction to Expressions==
+An expression is comnination of literals, variables, operators and function calls to calculate a single value,
+THre process of executing the expression to get a single value is known as an evaluation.
+And the single value produced is known as the result.
 
+[[Expressions Statements]]
+espressions by themselves cannot be compiled, that is why the have to be part of semicolon ending
+statements, but an expression can be converted to an executable statement by placing a semicolon at the end
+of the statement.
+
+{{{cpp
+int main()
+{
+  std::cout << (x = 5) << '\n' ;   // this is a statement with nested expressions
+  x = 5                            // this is one of the nested expression in the above statement (would result to an error)
+  x = 6;                           // this is an expressions statement (semicolon added)
+}
+}}}
+
+Note:
+- expressions are subset of statements
+- when an expression is converted to an expression statement its return value is discarded because its no longer important
