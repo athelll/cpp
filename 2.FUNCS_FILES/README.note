@@ -151,5 +151,111 @@ Note:
 - avoid using `using-directives` at the top of your code or in header files, it violates the
   whole reason why namespaces were added in the first place.
 
-[[Introduction to the Pre-Processor]]
+==Introduction to the Pre-Processor==
+
+The preprocessing is the first stage of all stages that leads to an executable after writing
+a program
+
+stages of code compilation:
+- preprocessing
+- compiling
+- assembling
+- linkage
+- executable
+
+What the preprocessor does:
+- strips all comments from the code file
+- ensures each code files end with a new line
+- processes preprocessor directives (`#include`, macros, `#ifndef`, etc.)
+- converts code files to a `translation unit`, which is what is fed to the compiler for
+  compilation.
+
+[[Translation]]
+Preprocessing, compiling and linking all together is known as translation.
+
+[[Preprocessor Directive]]
+
+When the preprocessor scans through a source code, it usually scan top to bottom looking for
+preprocessor directives
+
+Preprocessor Directives are just instructions that start with the `#` symbol and end with a new-line
+it tells the preprocessor to perform some text manipulation to the source code
+
+Keep in mind that the preprocessor does not undertand c++ syntax, preprocessors use their own syntax
+for text manipulation and preprocessing tasks. which *SOMETIMES* resemble c++ syntax.
+
+[[Common preprocessor directives in cpp]]
+
+- `#include`: used to include the contents of a file in another code, it is used to add dependencies to
+  cpp code files.
+- `#define`: it used to create macros, macros are rules that define how input text is converted to
+  replacement output text.
+
+
+[[Macros]]
+
+ways to create macros:
+1) Object-like macros with substitution text:
+{{{cpp
+  #define MY_NAME "Felix"
+
+  int main()
+  {
+    std::cout << MY_NAME << "\n";         // the MY_NAME macro is replaced with "Felix"
+  }
+}}}
+
+2) Object-like macros without substitution text:
+{{{cpp
+  #define NOTHING
+
+  int main()
+  {
+    std::cout << NOTHING << "\n";          // the NOTHING macro is replaced with nothing
+  }
+}}}
+
+3) Conditional compilation: conditional compilation macros allows you to define under what circumstances
+  what should and should not compile.
+{{{cpp
+  #include <iostream>
+
+  #define PRINT_MOM
+
+  int main()
+  {
+  #ifdef PRINT_MOM
+    std::cout << PRINT_MOM << "\n";        // this will compile because PRINT_MOM is defined.
+  #endif
+
+  #ifdef PRINT_DAD
+    std::cout << PRINT_DAD << "\n";        // this will not compile because PRINT_DAD is not defined.
+  #endif
+
+  #ifndef PRINT_ME
+    std::cout << PRINT_ME << "\n";         // this will compile because PRINT_ME is not defined.
+  #endif
+
+  #if 0
+    std::cout << "Bob\n";                  // nothing in the if 0 block compiles.
+    std::cout << "Steve\n";
+  #endif
+
+  #if 1
+    std::cout << "Steve\n";                // the if 1 macro block always compile
+  #endif
+
+  return 0;
+  }
+}}}
+
+Note:
+- Object luke macros do not affect other preprocessor directives they only do code substitution
+  for normal code.
+- Macros and preprocessor directives have no concept of scope.
+
+== Header Files ==
+
+Header files allow us to put declarations in one location and then import them wherever we need them.
+This can save a lot of typing in multi-file programs.
 
