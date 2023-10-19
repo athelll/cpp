@@ -259,3 +259,26 @@ Note:
 Header files allow us to put declarations in one location and then import them wherever we need them.
 This can save a lot of typing in multi-file programs.
 
+[[header guards]]
+
+there are two convetinonal ways of header guarding
+
+1) traditional method: responsibility of gaurding is left for the develper to handle
+{{{cpp
+  // this is a header file
+  #ifndef HEADER_NAME
+  #define HEADER_NAME
+
+  // header contnt goes here
+
+  #endif
+}}}
+
+2) using `#prama once` directive: the compiler has the reponsivility to header guard. not the dev.
+{{{cpp
+  // this is a header file
+  #pragma once
+  // content goes here
+}}}
+
+
