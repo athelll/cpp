@@ -1,0 +1,319 @@
+= Fundamental Data Types =
+= Felix Okoronkwo 20/10/23 =
+
+== Introduction to fundumental data types  ==
+
+When a proram executes, specific memory is assigned to the program from the ram to take care of
+data handling, storage and manipulation during the lifetime of the program, this data to be imposed on the ram
+for either storage, manipulation or what-not are stored at memory addresses of the ram.
+
+The size of data stored span from the memory address the data was allocated to and end at the memory address arithmetically equal
+to the displacement sum, of the size of the data to be handeled, from the beginning memory address the data was assigned to.
+
+A single memory address holds one byte of data
+
+byte is a group of bits that are operated on singularly, modern standard byte consists of bits
+
+bits or binary storage are smallest piece of memory storage, they can only store either 1 or 0, you can thinl of them as
+on or off switches.
+
+[[List of primitive data-types]]
+
+| Types                                      |    Category    |                 Meaning                 | Example |
+|--------------------------------------------|----------------|-----------------------------------------|---------|
+| float, double, long double                 | Floating point |      a number with fractional part      | 3.14159 |
+| bool                                       |    Boolean     |              true or false              |  true   |
+| char, wchar_t, char8_t, char16_t, char32_t |   character    |        single character of text         |   'c'   |
+| short int, int, long int, long long int    |    integer     | postive and negative numbers incluing 0 |   64    |
+| std::nullptr_t (c++11)                     |  Null pointer  |             a null pointer              | nullptr |
+| void                                       |      Void      |                 no type                 |   n/a   |
+
+[[The _t suffix]]
+
+the `_t` suffix is used to denote that a data-type, its a popular nomenclature used in modern data-types
+its not a consistently applied rule of thumb but its worth noting.
+
+
+== Void ==
+
+Void is an imcomplete type that has no datatype
+
+[[Incomplete type]]
+
+Incomplete types are dataypes that have been decalred but not defined, the compiler knows of the existence of such types
+but since its not defined not enough information is there for the compiler to know what amount of memory to allocate for
+an object of that type.
+
+Incomplete types cannot be instatiated:
+{{{cpp
+  void value;     // wont work because void is an incomplete datatype.
+}}}
+
+Void use cases:
+- for defining functions that do not need to return anything
+- for defining functions that do not need an argument in C/C++ (deprecated in c++)
+
+== Object sizes and the sizeof operator ==
+
+To generalize an object with `n` bits can hold up to `2 exponent n` unique values
+
+[[sizeof operator]]
+
+- its a unirary operator that takes in a datatype and returns the size of the dataype in in bytes
+- Sizeof opertor do not work well with incomplete types and results in compilation error
+- you can also use it on varible names
+- it does not include dynamically alloctes memory used by an object
+
+== Signed Numbers ==
+
+An integer is an integral type that can represent a poitive number, negative number and the nuber zero.
+
+types of integrs:
+
+| Type          | Minimum size | Note                                     |
+|---------------|--------------|------------------------------------------|
+| short int     | 16 bits      |                                          |
+| int           | 16 bits      | typically 32 bits in modern architecture |
+| long int      | 32 bits      |                                          |
+| long long int | 64 bits      |                                          |
+
+the key diff, between varying integers is that they have varying sizes
+
+Note:
+- C++ only guarantees that a dataypes will have a minimum size, not that they will have a specific size
+- bool and char are considered to be integral datatypes becuase they store their values as integers
+
+
+[[signed integers]]
+
+- By default integers are signed meaning they, store the signed state og their numbers,
+ so they can either represent positive or negative numbers and even the number zero.
+
+- unsigned intgers are integers thay are only capable of storing non-negative numbers
+
+- a single bit known as the sign bit is used tp store the sign of a number
+  non-sign bits are known as magnitude bits.
+
+ways to define signed integers:
+{{{cpp
+  short s;      // prefer "short" instead of "short int"
+  int i;
+  long l;       // prefer "long" instead of "long int"
+  long long ll; // prefer "long long" instead of "long long int"
+}}}
+
+- you can also use the signed keyword to depict that a data-type is signed, but the keyword should'nt
+  be used as it is redundant.
+- as we have learnt the varible with `n bits` can hold `2^n` bits. but the specfic values it can hold is known
+  as its range, its determined by 2 factors its size in bits and whether it is sized or not.
+  therefore the range of an int is `-2^31 < 0 < 2^31 - 1`, because signed int holds both positive and negative
+  numbers, and one bit holds the signed or unsigned propert of the int
+- `n bit` signed datatyped posses a range of `-2^(n-1) < 0 < ( 2^(n-1) -1 )`
+- when a value outside the range of a type is assigned to variable of that type `Overflow` will take place
+- `Overflows` kead to undefined behaviours.
+- when an arithmetic operation attempts to create a value oustide the range of the type its operting on, `integer` or
+  `arithmetic overflow` takes place.
+- Integer division leaves its fractional part from its result, as expected becus integers can only hold a specific range
+  anything other than that can be morphed into something that it can accept as a value.
+
+== Unsigned integers, and why to avoid them ==
+
+[[Unsigned Int]]
+
+This datatype can only hold non-negative numbers, to define an unsigned integer we use the unsigned keyword.
+
+{{{cpp
+  unsigned short us;
+  unsigned int ui;
+  unsigned long ul;
+  unsigned long long ull;
+}}}
+
+- unsigned int can hold twice the positive values that a normal signed int can
+
+[[modulo wrapping]]
+
+When value greater than an `unsigned int` type is tried to be stored in a variable of that type, modulo wrapping occurs
+how modulo wrapping works is that it takes the largest number that type can store adds 1 to it and then the result
+is used to divide the overflowing value, whatever the remainder is, is stored in the variable.
+
+{{{cpp
+  #include <iostream>
+
+  int main()
+  {
+    unsigned short x{ 65535 }; // largest 16-bit unsigned value possible
+    std::cout << "x was: " << x << '\n';
+
+    x = 65536; // 65536 is out of our range, so we get modulo wrap-around
+    std::cout << "x is now: " << x << '\n';
+
+    x = 65537; // 65537 is out of our range, so we get modulo wrap-around
+    std::cout << "x is now: " << x << '\n';
+
+    return 0;
+  }
+}}}
+
+[[negative modulo wrap-around]]
+
+when a negative number is assigned to an unsigned int the value wraps iteslf to the largest value of that int
+and then stores the absolute difference between the negative number and the largest number that that type
+can hold
+
+It’s possible to wrap around the other direction as well. 0 is representable in a 2-byte unsigned integer,
+so that’s fine. -1 is not representable, so it wraps around to the top of the range, producing the value 65535.
+-2 wraps around to 65534. And so forth.
+
+[[NOte]]
+
+Many bugs in the video game industry has happend due to warp around behavuiour with unsigned integers
+
+[[Controversy over signed integers]]
+
+many develping companies including google believe that unsigned int should not be due to how easily compared to signed
+integers to overflow, since overflowing can easily happen when the value goes under 0, unlike signed in which overflowing
+happen at a largely considerable range far away from 0 both on the negative and positive direction.
+
+[[When to use unsigned numbers]]
+
+There are still a few cases in C++ where it’s okay / necessary to use unsigned numbers.
+
+First, unsigned numbers are preferred when dealing with bit manipulation (covered in chapter O -- that’s a capital
+‘o’, not a ‘0’).
+They are also useful when well-defined wrap-around behavior is required (useful in some algorithms like encryption and random number generation).
+
+Second, use of unsigned numbers is still unavoidable in some cases, mainly those having to do with array indexing.
+We’ll talk more about this in the lessons on arrays and array indexing.
+
+Also note that if you’re developing for an embedded system (e.g. an Arduino) or some other
+processor/memory limited context, use of unsigned numbers is more common and accepted (and in some cases, unavoidable)
+for performance reasons.
+
+== Fixed-width integers and size_t ==
+
+The dynamic nature of integers size date back in C, when computers where slow and performance was an issue, C left
+the size of integers open so that the compliler implementers could choose what size was efficient for the architecture
+the program would run on.
+
+[[Fixed width integers]]
+
+To address the issues of dynamic integers sizes on differrn machines, C99 came up with `fixed width intgers` in the
+`<cstdint>` header, that is guaranteed to be the same size on any architecture.
+
+{{{cpp
+  #include <cstdint>
+  #include <iostream>
+
+  int main()
+  {
+    std::int16_t i{ 5 };
+    std::cout << i << "\n";
+    return 0;
+  }
+}}}
+
+[[Downsides of fixed-width integers:]]
+
+- they are not guaranteed to be defined on all architectures. they only exits on systems with theri fundamental type
+  matchin their types and with similar binary representations.
+  your program will fail to compile on any architecture that does not support a fixed width type integer your
+  program is using.
+- A fixed width integer maybe slower than some wider types in on some architectures, your program might be using a fixed
+  width type of 32 bits when the case is that your CPU processes 64 bit integers faster than 32 bits, but this also
+  might not be a threat to efficiency because, most programs are memory constrained meaning that though your CPU might
+  be faster in processing a wider sized integer type, sometimes larger memory footorints quickly slow
+  your computer down faster than your CPU processes the wider, more memory consuming, sized integer types.
+
+[[fast and least integers]]
+
+the `<cstdint>` headers also contain 2 more variants of integral types
+
+1) least type: this are intgeral types with at least the specified number of bits needed
+2) fastest type: this are intgeral types that contain at least the number of bits needed for a computation
+  that will be processed faster considering your systems architecture.
+
+[[size_t]]
+
+This is an unsigned integral type that is used mainly for counting or determining the size of objects in bytes.
+
+Notes:
+- `std::size_t` is returned by the `sizeof()` operator not an `int`
+- the `sizeof(std::size_t)` compiled on a system tells the largest size of bytes that your system can process at most.
+  which is usually the number of bits your systems architecture was designed on.
+- it belongs to the `<cstddef>` header.
+
+
+== Introduction to scientific notation ==
+
+in cpp precise numbers can be expressed in scientific notation using the `e` symbol with numbers,
+where digits before the `e` sign is the `significand` while digits after it is the `exponent`.
+
+{{{cpp
+  double positive_sci_notation { 3.142e10 };             // equivalent to 3.142 * 10^10
+  double negative_sci_notation { 3.142e-10 };            // equivalent to 3.142 * 10^-10
+}}}
+
+
+== Floating points numbers ==
+
+Flaoting point numbers are numbers that can hold fractional part, they are always signed, they are of 3 types
+`float, double and long double`.
+
+| Category       | type        | minimum size | typical size      |
+|----------------|-------------|--------------|-------------------|
+| floating point | float       | 4 bytes      | 4 bytes           |
+|                | double      | 8 bytes      | 8 bytes           |
+|                | long double | 8 bytes      | 8, 12 or 16 bytes |
+
+Note:
+- when making floating point literals include at least on decimal place even if the decimal place is `.0`
+  this helps the compiler understand that this number is not an integer but a float.
+- by default flaoting point literals default to doubles, using the `f` suffix to the literal makes sure the number
+  is stored as a `float`
+
+{{{cpp
+ int x {5};                       // integer
+ double y {5.0};                  // float
+ float z {5.0f};                  // f suffix is used to declare as a float
+}}}
+
+[[printing floating numbers]]
+
+- `std::cout` foes not print the fractional part of a float is the fractional part is `.0`
+- if a float number is a precice number os justifyable quantity, it would be printed in scientific notation.
+
+[[floating point range]]
+
+blah blah blah, did'nt read this section
+
+[[Floating point precision]]
+
+the precision of a floating number is the number of signifivan t figures it can represent without information loss.
+
+when outputing floating points `std::cout` has a precision value of 6 , that means prinying any float with any
+significant number greater than 6 digits the remaining digiys would be truncated.
+
+the precision value of `std::cout` can be modifyed from its default using `std::setprecision()`
+from the `<iomanip>` header.
+
+{{{cpp
+  #include <iomanip>
+  #include <iostream>
+
+  int main()
+  {
+    std::cout << std::setprecision(15);
+    std::cout << 3.33333333333333333333333333333333333333f <<'\n'; // f suffix means float
+    std::cout << 3.33333333333333333333333333333333333333 << '\n'; // no suffix means double
+
+    return 0;
+  }
+}}}
+
+[[Floating point range]]
+
+check here [[www.learncpp.com/cpp-tutorial/floating-point-numbers]]
+Flaoting point range section
+
+
