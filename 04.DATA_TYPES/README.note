@@ -14,7 +14,7 @@ A single memory address holds one byte of data
 
 byte is a group of bits that are operated on singularly, modern standard byte consists of bits
 
-bits or binary storage are smallest piece of memory storage, they can only store either 1 or 0, you can thinl of them as
+bits or binary storage are smallest piece of memory storage, they can only store either 1 or 0, you can think of them as
 on or off switches.
 
 [[List of primitive data-types]]
@@ -311,9 +311,308 @@ from the `<iomanip>` header.
   }
 }}}
 
+floats have less precison than doubles.
+
 [[Floating point range]]
 
 check here [[www.learncpp.com/cpp-tutorial/floating-point-numbers]]
 Flaoting point range section
 
+[[output manipulators]]
 
+They alter how data is output, they are defined in the `<iomanip>` header, the `std::setprecision()` function
+sets the precison intgeral of the `std::cout` instance and is an output manipulator.
+
+Note:
+- output manipulators and input manipulators are sticky, meaning if you set they they remain set.
+- favour doubles to floats if space is at premium, as the lack of precision in float can lead to inacuracies.
+
+[[Rounding errors make floating point comparisons tricky]]
+
+floating point numbers result to arithmetic errors due to the differences in hpw we percieve numbers and how binary works
+for example if we wanted to represent the number `0,1`, the fraction of `1/10` figuratively its easy, its `0.1` but in
+binary the `0.1` is represented as the sequence `0.00011001100110011...` that goes on to infinity and due to the limitaions of
+the floats and doubles that only ensure a specific digits of presicion, rounding ups occur that can lead larger margins of
+error as layers of arithmetic operations increases.
+
+since doubles ensure 18 digits of precision, assigning 0.1 to a double and printing the result with `std::setprecision(17)`, thats
+1 digit above the the guaranteed digits of precision a double posses, running the code below:
+
+{{{cpp
+ #include <iomanip>
+ #include <iostream>
+
+ int main()
+ {
+  double x {0.1};
+  std::cout << std::setprecision(17);
+  std::cout << x << '\n';
+ }
+}}}
+
+we would notice that executable would print:
+`0.10000000000000001`
+
+notice after the 16th digit, an error in value is introduced, the `1`.
+
+this result is close to `0,1` but is not precisely, `0.1`, the error margin might look negligible but layers ot arithemetics
+with this occuring at every layer of computation, continuisly, can lead to incredibly larger, buggier errors.
+Rounding errors may make a number either slightly smaller or slightly larger, depending on where the truncation happens.
+
+due to the fact that floating numbers are inexact, computations that deal with comparison of floating numbers are often
+doomed to be error proned.
+
+for example:
+
+{{{cpp
+ #include <iomanip>
+ #include <iostream>
+ int main()
+ {
+  std::cout << std::setprecision(17);
+  double x { 1.0 };
+  std::cout << x << '\n';
+  double y { 0.1 + 0.1 + 0.1 + 0.1 + 0.1 + 0.1 + 0.1 + 0.1 + 0.1 + 0.1 };         // 0.1 added 10 times which should result to 1
+  std::cout << y << '\n';
+ }
+}}}
+
+compiling and running this it is noticed that the second print statement prints:
+`0.99999999999999989`
+which is a rounding error raised by the inexact nature of floats, and a comparison computaion that
+tries to compare x and y equality would be false, even though logically it should be true.
+
+comparing floating numbers is generally problematic.
+The solution to this problem will be explained later, according to wetin i dey read.
+
+Note:
+- never assume flaoting numbers are exact, this si not an exception, its a rule
+- rounding errors in floating numbers generally occur due to the inability of floating numbers to store some numbers precisely
+  due to thier limitaion in memory.
+
+[[NaN and Inf]]
+
+there are two special categories for floating numbers, which are `NaN` and `Inf`,
+
+1) Nan - Not a number, represents mathematically invalid values.
+2) Inf - represents infinity can be poitive or negative infinty.
+
+NOte:
+Avoid division by zero
+
+
+== Boolean values ==
+
+Boolean variables are variables that only have only two possible values, `true` or `false`
+they are declared using the `bool` keyword.
+
+{{{cpp
+  bool b1 { true };
+  bool b2 { false };
+  b1 = false;
+  b2 = !false;
+  bool b3 { !false };
+  bool b4 {};                 // defaultly initialized to false.
+}}}
+
+[[Printing boolean values]]
+
+Due to the fact that boolean types are basically just integral datatypes that hold either 1 or 0, for true and false.
+printing them just prints either 1 or 0.
+
+to make bools print `true` or `false`, pass the `std::boolalpha` into the `std::cout`.
+
+{{{cpp
+  #include <iostream>
+
+  int main()
+  {
+    std::cout << true << '\n';
+    std::cout << false << '\n';
+
+    std::cout << std::boolalpha;
+
+    std::cout << true << '\n';
+    std::cout << false << '\n';
+  }
+}}}
+
+== Introduction to if statements ==
+
+If statements are conditional statements that determines what to execute, depending on the resolution of a conditional.
+
+if statement syntaxes:
+{{{cpp
+
+  // syntax design one
+  if condition
+    single_statement;
+
+  // syntax design two
+  if condition_1
+    true_statement_handler;
+  else
+    false_statement_handler;
+
+  // syntax design 3
+  if (x > 0)
+    std::cout << "The value is positive\n";
+  if else (x < 0)
+    std::cout << "The value is negative\n";
+  else
+    std::cout << "the value is zero";
+
+}}}
+
+[[single statemnt return condition]]
+
+if there ever comes a need to write a syntax with this format:
+
+{{{cpp
+  if (condition)
+    return true;
+  else
+    return false;
+}}}
+
+it can be replaced with a return condition, making the code shorter and perfrom the same task
+
+{{{cpp
+  return (condition);
+}}}
+
+
+== Chars ==
+
+A char datatype was designed to hold a single character.
+
+a char dataype is an integral type, maeanng the underlying values are stored as integers. similar to ow boolean type
+stores 1 and 0 to be reprensented as true and false, chars store integers that are mapped to ASCII characters.
+
+range of ASCII cahracters `0 to 127`.
+characters are always represented in single quotes.
+
+`0-31` unprintable characters, `32-127` printable characters.
+
+[[Initializing characters]]
+
+{{{cpp
+  char ch1 {'d'};               // best practice
+  char ch2 {97};                // initialize with integer 97 'a' in the ascii format (not preferred)
+}}}
+
+[[Printing chars]]
+
+when printing a char `std::cout` prints it out as an ascii character.
+
+[[Inputing char]]
+
+the `std:cin` accepts char input to be stored into a char dataype
+if more than one char was inputed on;y the forst string is stored into the char, the rest is kept in the
+`std::cin`, buffer and is flushed and printed one character at a time with subsequent calls to `std::cin`.
+
+
+== Introduction to type conversion and static_cast ==
+
+Cpp, in mpst cases, allows us to convert a type from one fundamental type to another, this is known as type
+conversion, wehn he compiler does this on our behalf without us asking this is known as `Implicit type Conversion`.
+
+[[Type conversion produces a new value]]
+
+Type conversion does not actually change the value or type of the value being converted instead. the value
+to be converted as used as input, and conversion results to a new value of the target type (via direct initialization).
+
+Npte:
+- one of the reasona that brace initialization is preferref is because it would not allow us initialize a variable
+  with am initializer that would loose value when its implicitly type converted.
+
+
+== An introduction to explicit type conversion via the static_cast operator ==
+
+Explicit type conversion occurs when the progrommer explicitly tells the compiler to convert a type from one
+form to another saying we bear full responsibilities for any loss in data that might occur.
+
+to perform type conversion we use the `static_cast` operator.
+
+syntax for explicit type conversion:
+{{{cpp
+  static_cast<new_type> (expression);
+}}}
+
+Note:
+- whenever a `<>` appears in cpp, the content in the brackets is usually a type.
+
+{{{cpp
+
+  #include <iostream>
+
+  void print(int x)
+  {
+    std::cout << x << '\n';
+  }
+
+  int main()
+  {
+    double x {5.6};
+    print( static_cast<int> x );
+
+    return (0);
+  }
+
+}}}
+
+The above snippet is an example of explicit type conversion using `static_cast`.
+
+
+== Using static_cast to convert char to int ==
+
+{{{cpp
+  int ascii_value_of_c = static_cast<int> 'c';
+}}}
+
+== Converting unsigned numbers to signed numbers ==
+
+{{{cpp
+  int main()
+  {
+    unsigned int x {6};
+    int y { static_cast<int> x };
+
+    return (0);
+  }
+}}}
+
+`static_cast` does not perform value range checking, therefore, in the above snippet, if the value of x is
+greater than the range an int can handle asn its type converted using `ststic_cast` undefined behaviour might
+occur.
+
+== std::int8_t and std::uint8_t likely behave like chars instead of integers ==
+
+on some architectures `std::int8_t`, `std::uint8_t` or any 8 bit fixed-width integral type in the `<cstdint>`
+header, are treated as chars. this can be prevented by explicit type conversion to int.
+
+in this snippet:
+
+{{{cpp
+  #include <cstdint>
+  #include <iostream>
+
+  int main()
+  {
+    std::cout << "Enter a number between 10 and 127: ";
+    std::int8_t number{};
+    std::cin >> number;
+
+    std::cout << "you inputed " << static_cast<int> (number) << '\n';
+    return 0;
+  }
+}}}
+
+if you inputed 35 you might be expecting 35, but the result would be 51, this is because
+`std::int8_t` is treated as a char so it treats the content of the input stream as a buffer of characters
+and its strips and stores the first character it encouters, shich in this case is `3`, which has the ascii
+value `51`, thus the result from running the executable.
+
+== Const variables and symbolic constants ==
+
+to be continued
