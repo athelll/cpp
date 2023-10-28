@@ -615,4 +615,280 @@ value `51`, thus the result from running the executable.
 
 == Const variables and symbolic constants ==
 
-to be continued
+{{{cpp
+  const double gravity {9.8};
+}}}
+
+lost my notes here, oh well
+
+- prefer const variables to object-like macros for symbolic constants.
+- const variables must be initialized.
+- const variables values cannot be changed.
+
+== Compile-time constants, constant expressions, and constexpr ==
+
+- Constant expression are expressions that can be evaluated by the compiler at compile time.
+- Compile-time constants: this are constants that their values are known at compile time. eg, literals
+- A const variable is a compile time constant if its initializer is a constant expression.
+- Runtime const:  this are constant variables that its initialization values are not known untill runtime.
+
+{{{cpp
+  #include <iostream>
+
+  int getNumber()
+  {
+    std::cout << "Enter a number: ";
+    int y{};
+    std::cin >> y;
+
+    return y;
+  }
+
+  int main()
+  {
+    const int x{ 3 };           // x is a compile time constant
+
+    const int y{ getNumber() }; // y is a runtime constant
+
+    const int z{ x + y };       // x + y is a runtime expression and z is a runtime const
+
+    return 0;
+  }
+}}}
+
+[[The constexpr keyword]]
+
+When a const variable is declared te compiler is not aware of its a runtime or compile-time constant, so it implicitly tracks it.
+to declare a compile time constant that would raise an error when placed in a state of runtime dependency,
+the `constexpr` keyword is used. this is efficient for maxing optimizations.
+
+the `constsxpr` variable can only be initialized with compile-time values, if not the compiler would throw an error
+
+{{{cpp
+  constexpr double earth_gravity { 9.8 };
+}}}
+
+any variable that should not be modifiable after its initization and its initializer is known at `compile-time`, should be
+declared as a `constexpr` variable.
+
+any variabke that should not be modifiable after it initialization and its initializer is known at `runtime`, should be
+declared as a `const` variable.
+
+- because `constexpr` objects must be initialized upon declaration (with a compile time constant), they can not be used
+  as function parameters.
+
+[[When are constant expressions actually evaluated?]]
+
+C++ is designed to always evaluate constant exoressions at compile time in contexts that require constant expressions,
+(such as initilizer of a compile time contant.)
+
+in a situation that a compile time constant is not required, the compiler can choose to evaluate either at compile time or runtime.
+
+{{{cpp
+  constexpr int x { 4 + 5 }           // compile tiee evaluation
+  const int y { 999 };                // compile time evaluation
+
+  int z { 6 + 9 };                    // either runtime or compile time.
+}}}
+
+[[Constant folding for constant subexpressions]]
+
+in the following example:
+
+{{{cpp
+  int main()
+  {
+    constexpr int x { 4 + 3 };          // constant exoression
+    std::cout << x << '\n';             // runtime expression
+  }
+}}}
+
+this snippet can be narrowed into a more optimized version:
+
+{{{cpp
+  int main()
+  {
+    std::cout << 4 + 3 << '\n';         // this is a runtime expression.
+  }
+}}}
+
+The second snippet is a `constant sub-expression`, which compilers have been designed to execute optimally,
+than whatevers going on in the first snippet.
+
+This optimization is known as `constant folding`, where instead of creating a constant variable to hold a value
+that another statement would depend on to execute, the value the statement is depending on, would be placed in the statement
+itself.
+
+like above.
+
+
+== Literals ==
+
+Literals are values inserted directly into the code.
+
+Examples:
+{{{cpp
+  return 5;                     // 5 is an integer literal
+  bool myNameIsAlex { true };   // true is a boolean literal
+  double d { 3.4 };             // 3.4 is a double literal
+  std::cout << "Hello, world!"; // "Hello, world!" is a C-style string literal
+}}}
+
+[[literal types]]
+
+| Literal Value       | Examples       | Default literal type | Note           |
+|---------------------|----------------|----------------------|----------------|
+| integer value       | 5, 0, -3       | int                  |                |
+| boolean value       | true, false    | bool                 |                |
+| flaoting point type | 1.2, 0.0, 3.4  | double (not float!)  |                |
+| character           | 'a', '\n'      | char                 |                |
+| C-style string      | "Hello World!" | const char[14]       | C style string |
+|                     |                |                      |                |
+
+Note:
+- if the default type of a literal is not desired, you can change the type of the literal with a suffix. 
+  check [[www.learncpp.com/cpp-tutorial/literals/]], literal suffix section ofr list of suffixes.
+- By default, floating point literals have a type of double. To make them float literals instead, the f (or F) suffix should be used
+- C -style string literals are null byte, terminated (obviously).
+- A magic number is a literal (usually a number) that either has an unclear meaning or may need to be changed later.
+- Using magic numbers is generally considered bad practice, this can be fixed by using symnolic constants.
+
+EXAMPLE:
+
+this should be done:
+{{{cpp
+  int main()
+  {
+    constexpr int maxStudentsPerClass { 30 };
+    constexpr int totalStudents{ numClassrooms * maxStudentsPerClass }; // now obvious what this 30 means
+
+    constexpr int maxNameLength{ 30 };
+    setMax(maxNameLength); // now obvious this 30 is used in a different context
+  }
+}}}
+
+instead of:
+{{{cpp
+  int main()
+  {
+    constexpr int totalStudent(numClassrooms * 30);  // in this code 30 acts as a magic number,
+    setMax(30);                                      // also here, its meaning can be guessed but ultimately, its ambigious
+  }
+}}}
+
+- magic numbers are'nt always numbers, they are literals of any type that its meaning in a codebase is hard to tell.
+  avoid them.
+
+
+== Numeral systems (decimal, binary, hexadecimal, and octal ==
+
+prefixes fro differnt number sytem literals:
+
+| Number system             | base | prefix   |
+|---------------------------|------|----------|
+| octal number system       | 8    | 0 (zero) |
+| hexadecimal number system | 16   | 0x       |
+| binary number sytem       | 2    | 0b       |
+|                           |      |          |
+
+[[Digit seperators]]
+
+Because long literals can be hard to read c++14 introduced digit seperators. `'`, a singe quatation mark.
+
+{{{cpp
+  int bin { 0b1001'1010 };
+  long value { 2'113'233'478 };         //easiser to read.
+}}}
+
+- Digit separators are purely visual and do not impact the literal value in any way.
+
+[[Outputting values in decimal, octal, or hexadecimal]]
+
+this is done using io manipulators `std::hex`, `std::bin`, `std::oct`, rememeber once set its stays sets unless
+explicitly changed.
+
+{{{cpp
+  int value { 12 };
+
+  std::cout << x << '\n';
+  std::cout << std::hex << x << '\n';
+  std::cout << std::oct << x << '\n';
+  std::cout << std::bin << x << '\n';
+  std::cout << std::dec << x << '\n';
+  std::cout << x << '\n';
+}}}
+
+[[Outputting values in binary]]
+
+outputing binary is a bit complex for `std::cout` so to solve this, c++ has a special type that stores desired number of bits,
+`std::bitset<n>`, where n is the number of bits to be stored.
+
+it is contained in the `<bitset>` header, it us used to create `bitset` objects that only stores the specified number of bits
+you want to store, and its efficient for outputing bits. the number of bits must be a compile-time constant.
+
+{{{cpp
+  #include <bitset>
+  #include <iostream>
+
+  int main()
+  {
+    std::bitset<8> x { 0b1001'1011 };
+    std::bitset<8> y { 0xC5 };              // the bitset type accepts integral initializer of any number system.
+
+    std::cout << x << '\n' << y << '\n';
+    std::cout << std::bitset<4> { 0b1010 } << '\n';       // a temporary anonymous object with 4 bits of size was created here.
+    // it would be discarded after usage
+  }
+}}}
+
+The format library can also be used.
+
+{{{cpp
+  #include <format>
+  #include <iostream>
+  #include <print>
+
+  int main()
+  {
+    std::cout << std::format("{:b}\n", 0b1001);
+    std::cout << std::format("{:#b}\n", 0b1111);
+
+    std::print("{:b} {:#b}\n", 0b1010, 0b1110);
+  }
+}}}
+
+this prints:
+`1001
+0b1111
+1010 0b1110`
+
+
+== Introduction to std::string ==
+
+[[introducing std::string]]
+
+the easiest way to work with string objects is with `std::string` type in the `<string>` header.
+just like normal objects they can be  initilized and assigned values
+
+{{{cpp
+  #include <string>
+
+  int main()
+  {
+    std::string name {};
+    std::string name_2 { "jacob" };
+    name_2 = "calliope";
+
+    return 0;
+  }
+}}}
+
+- they output as expected using `std::cout`, empty strings peint nothing
+- they can handle strings of different length. this is one of the reasons that std::string is so powerful.
+{{{cpp
+  std::string name { "calliope" };
+  name = "Gaia";
+  name = "hectaconchires";                      // all this pose no error. unlile in C with C-style strings.
+}}}
+
+
