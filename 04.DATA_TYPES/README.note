@@ -892,3 +892,159 @@ just like normal objects they can be  initilized and assigned values
 }}}
 
 
+==The conditional operator==
+
+considtional operator `?:`, can help us reduce the code needed to write conditional statements of this format:
+{{{cpp
+  if (condition)
+    value = statement_1;
+  else
+    value = statement_2;
+}}}
+
+into:
+{{{cpp
+  value = (condition) ? statement_1 : statement_2;
+}}}
+
+- the conditional operator helps to compact code without losing readablity.
+- the conditional operator evaluates to an expression. so it can be used as an initilizer or value
+
+{{{cpp
+  #include <iostream>
+
+  int main()
+  {
+    constexpr bool classIsBig{ false };
+    constexpr int size { classIsBig ? 30 : 10 };
+    std::cout << "the class size is " << size << '\n';
+
+    return 0;
+  }
+}}}
+
+- The type of expression should match or be convertible.
+
+Example:
+{{{cpp
+  #include <iostream>
+
+  int main()
+  {
+    constexpr int x { 5 };
+    std::cout << (x != 5 ? x : "x is five") << '\n';        // this wont compile.
+  }
+}}}
+
+The above snippet wont compile because in the conditional statement the types of object to be evaluated on the condition,
+`(x != 5)`, are not the same and cannot even be converted to the same type, thus the compiler throws an error.
+
+- Prefer to avoid the conditional operator in complicated expressions.
+
+<!--TODO: Come back to this when your less sick.-->
+== Inline functions and variables ==
+
+- Inline expansion is a case where function call replaced by the code in the called function defination.
+- Inline function can reduce cpu overhead and act as an optimization
+- but if the function is too large it can pose a problem, because longer code tend to result to larger executables when compiled
+  and larger executables are usually slower (due to not being able to fit into memory caches.)
+
+<!--NOTE: Inline expansion could result in performance improvements, performance reductions, or no change to performance
+    at all, depending on the relative cost of a function call, the size of the function, and what other optimizations
+    can be performed.-->
+
+- inline functions are suited for simple and short functions. especially where the function can be executed more than once.
+
+when inline function occurs there are 2 results:
+1) may be expanded (most functions are in this category)
+2) cant be exapanded.
+
+{{{cpp
+  inline int min(int x, int y) // inline keyword means this function is an inline function
+  {
+    return (x < y) ? x : y;
+  }
+}}}
+
+<!--NOTE: BEST PRACTICE: Do not use the inline keyword to request inline expansion for your functions.-->
+
+[[Inline Variables]]
+
+These are variables that are allowed to be defined in multiple files.
+
+- In modern c++ inline has evolved to mean multiple definations allowed.
+
+Inline functiona and variables have 2 requirements:
+1) must have full defination (not just forward declarations)
+2) although multiple definations are allowed they must all be identical otherwise UB.
+
+- a linker will consolidate all inline functions or inline variable definations for an identifier into one single
+  defination, therefore still resppecting the one defination rule.
+- inline functiona and variables are basically defined in header files. this are benenfecial for header only libraries
+  (no .cpp files are included).
+- for most times you should define inline function and variables in header files.
+
+
+== Constexpr and consteval functions ==
+
+- constexpr functions can evaluate bothn runtime or comple time depending on their calling context
+- consteval functions only execute on compile time the keyword is: `consteval`
+- both consteval and constexpr are both implicitly inline functions
+- consteval functions shoould be defined in header files
+- you can define how constexpr function would handle runtime or compile-time contexts with a `std::is_constant_evaluated()`
+  conditional, this function is defined in the `<type_traits>`
+
+{{{cpp
+  #include <type_traits>
+
+  constexpr int run_this()
+  {
+    if (std::is_constant_evaluated())
+      // statements for compile-time evaluation goes here
+    else
+      // statements for run-time evaluation goes here
+  }
+}}}
+
+- you can use contsteval functions to force constexpr functions to evaluate at compile-time, with the helper function below
+{{{cpp
+  #include <iostream>
+
+  // NOTE: the auto keyword is a return type that makes a function work with any type.
+
+  consteval auto CompileTime(auto value)
+  {
+    return value;
+  }
+
+  constexpr int greater(int x, int y)
+  {
+    return (x > y ? x : y);
+  }
+
+  int main()
+  {
+    std::cout << greater(7, 2) << '\n';                   // may not evaluate on comile time.
+    std:: cout << CompileTime(greater(7, 2)) << '\n';     // would evaluate on runtime.
+    return 0;
+  }
+}}}
+
+- the above snippet porves that consteval functions can be used to force constexpr functon to run at compile time
+  even in context where a constant expression is not required.
+
+- const* functions do not allow const* parameters but their arguments can be const.
+- constexpr functions can call non-constexpr functions (becuase they can be evalauated in both runtime and compile time)
+  but this practice is best avoided.
+- The compiler must be able to see the full definition of a constexpr or consteval function, not just a forward declaration.
+  this is why its recommended to place them in header files and include them when needed. so as to make then visible
+  to the compiler no matter the translation unit.
+- consteval function are called immediate functions, because they are always evaluated at compile time.
+  and because of this their argument context and all must be constant based.
+
+<!--NOTE: const* stand for constexpr/consteval not const-->
+
+
+== std::string_view ==
+
+
