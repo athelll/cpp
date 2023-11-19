@@ -639,4 +639,145 @@ notes about `static_assert`:
 
 == Introduction to random number generation ==
 
+An algorthim is a finite sequence of instructions that can be used to solve a problem or complete a task.
+
+an algorithm is known to be `stateful` if it retains some kind of information within succesive calls.
+A `stateless` algorithm does not store any information as its being used (must be given all the information it needs to work).
+
+an algorithm is known to be determinstic if for a given input it would always produce he same output sequence.
+
+[[Pseudo-random number generators (PRNGs)]]
+
+a PRNGs is an algorithm that generates a sequence of numbers that mimics the sequence of randomness.
+
+simple PRNG algo implemetation:
+{{{cpp
+unsigned int LCG16()
+{
+  static int s_state{ 5323 };
+
+  // generate the next state by introducing overflows in the computaions to make it seem more random
+
+  s_state = 8253729 * s_state + 2396403;
+  return s_state % 32768;                   // added randomness.
+}
+
+int main()
+{
+  for (int count{ 1 }; count <= 100; ++count)
+  {
+    std::cout << LCG16() << '\t';
+
+    if (count % 10)
+      std::count << '\n';
+  }
+  return 0;
+}
+}}}
+
+this algorithm is a very bad random generator. should not be used. because at critcial (or maybe obvious) examination its deterministic.
+
+when a PRNG is initiated a value or list of values is used to insantiate he PRNG they are known as `random seeds or seeds` for short.
+when a value is used to initate a seed its known as a `seeded PRNG`.
+
+most PRNGs that produce quality results are usually seeded with values of 16 bits (if not more).
+
+the size of the seed can be samller than the state of the PRNGs if this happens the PRNGs is known to be `underseeded`.
+
+[[What makes a good PRNG?]]
+
+- the PRNGs shokd generate numbers with approx. almost the same probabilty. this is known as `distribution uniformity`
+- the method that the next number is generated in the sequence should not be predictable.
+- a good PRNG should have a good dimensional distrubution of numbers. meaning it should be able to generate odd, even, large, small etc. numbers at random.
+- A good PRNGs should have a high period for oys seeds. A period is the length of sequences before a PRNGs starts to repeat.
+- The PRNG should be efficient
+
+[[Randomization in C++]]
+
+the randomization capabilities in c++ are acessed with the `<random>` header of the standard library, there are 6 PRNGs families
+available for use since c++20
+
+read this for more info on the `<random>` header content: [[https://www.learncpp.com/cpp-tutorial/introduction-to-random-number-generation/#random]]
+
+the most preferred PRNGs that is used where non-predictability isnt extremmely crucial is the mersenne twister.
+its downside is that its later sequences can be predicted after examining its first 624 generated numbers. making it a no go for applications
+that require non-predictability.
+
+if your writing an application where non-prefictability is required your better off using a thid party library like:
+1) The Xoshiro family and Wyrand for non-cryptographic PRNGs.
+2) The Chacha family for cryptographic (non-predictable) PRNGs.
+
+[[Mersenne twister]]
+
+it belongs to the `<random>` header and it consists of 2 types:
+1) mt19974      : generates 32 bits unsigned integers.
+2) mt19974_64   : generates 64 bits unsigned integers.
+
+using tehr mersenne twister is straight forward:
+{{{cpp
+#include <random>
+#include <iostream>
+
+int main()
+{
+  std::mt19974 mt{};                  // instantiate on 32-bit mersenne twister object
+
+  for(int i{ 1 }; i <= 50; ++1)
+  {
+    std::cout << mt() << '\t';        // genreate a random number
+
+    if (i % 5 == 0)
+      std::cout << '\n';
+  }
+  return 0;
+}
+}}}
+
+it might be odd calling a variable as a function in the above code but the `mt()` syntax is a short form of calling `mt.operator()`, for this random object types
+the `operator()` function returns the next pseudo randomly generated sequence of the function being called. it more of a shorthand convention designed with
+this random genreating types in the `<random>` header.
+
+[[adding uniform distibution limits to the mersenne twister]]
+
+usually a 32 but mersenne twister will generate numbers from 0 to 4,294,967,295, but we dont always want numbers of that large of a range and sometimes
+requre a limit. this limit is added using a uniform distribution. PRNGs on theirn own cant add uniformly distibuted limits so their outputs are placed in functiona that can.
+
+this is done by using the random libraries random number distribution.
+
+random number distributions convert the the output of a PRNGs to a specified number distribution.
+there are a lot of random number distributions use for statistial analysis but theres one useful for normal random distibutions:
+in this case we can use the `uniform distibution` what it does is that it takes in two numbers, and produces outputs between numbers x and y (x and y inclusive)
+all with equal probability.
+
+theres a program that uses the uniform distribution to simulate the roll of 6 sided dice:
+
+{{{cpp
+#include <random>
+#include <iostream>
+
+int main()
+{
+  std::mt19974 mt{};
+  std::uniform_int_distribution die{1, 6};    // uniform distributor for numbers 1 - 6 (1 and 6 inclusive)
+
+  for(int count{1}; count <= 40; ++count)
+  {
+    std::cout << die(mt) << '\t';
+
+    if (count % 10 == 0)
+      std::cout << '\n';
+  }
+  return 0;
+}
+}}}
+
+on subsequent calls to the compiled executable of this code, it will be noticed that subsequent calls generate the same "random" numbers which is not very random-isque.
+to fix we need to seed the misernne twister with a random input on each call to create pseudo-random-num-generating functions. Since we cant just compute a random action
+, we are in a kind of catch 22, but we can introduce changing variables to emulate the feel of randomness. luckily the pseudo-random-number generators do
+not actually need a random seeds to spawn differnt outputs what it needs precisely is a changing seed with every call can be achieved using some attributes of our system like:
+1) the systems clock
+2) or the systems random device (/dev/random on linux, at least i think thats a linux random device)
+
+[[Seeding with the system clock]]
+
 
