@@ -697,3 +697,207 @@ int main()
 - Static local variables that have no initializer or a non-constexpr initializer are zero-initialized at program start
 - Just like we use “g_” to prefix global variables, it’s common to use “s_” to prefix static (static duration) local variables.
 - Avoid static local variables unless the variable never needs to be reset.
+
+== Using declarations and using directives ==
+
+A qualified name is a name that includes an associated scope
+An unqualified name is a name that does not include a scoping qualifier
+
+[[Using-declarations]]
+
+the using declaration alows us to use an unqualified name(with no scope) as an alias to a qualified name.
+it helps to reduce repitition in code of the namespace scope an object belongs to, when trying to access the object.
+
+{{{cpp
+#include <iostream>
+
+int main()
+{
+  using std::cout;
+  cout << "Hello Incels\n";    // `std:` is not needed.
+}
+}}}
+
+- Although this method is less explicit than using the std:: prefix, it’s generally considered safe and acceptable
+  (when used inside a function).
+
+[[Using-directives]]
+
+a using directive imports all names from a namespace into the scope the using directive was declared.
+{{{cpp
+#include <ipstream>
+
+int main()
+{
+  using namespace std;
+
+  cout << "Hello red poeple\n"; // unqualified identfier cout now epresents std::cout since declaring the using directive on std
+  return 0;
+}
+}}}
+
+[[Problems with using-directives (a.k.a. why you should avoid “using namespace std;”)]]
+
+due to the fact that using directives import all names from a namespace including names youll likely nevver use, the
+probabilty of a naming collison occuring skyrockets (especially if you import the std namespace).
+
+when this naming collison occurs due to imported namespaces names clashing with user-defined variables name or even other imported namespaces
+names, an `ambiguity error` arises.
+
+Note that when the compiler executes function calls if there are multiple declaration of that function with the same identifer in the same scope the compiler
+picks the best fit (likely one that the call to that functon does not need type convrsions to pass the arguments into the functions parameters and other
+optimization tasks like that), especially if one of the functions belong to some namespace and was imported into te calling scope. This behaviour can
+(sometimes) lead to unexpected results.
+
+exmaple:
+{{{cpp foolib.h: this is some librarys header
+#ifndef FOOLIB_H
+#define FOOLIB_H
+
+namespace foo
+{
+  int someFcn(int)
+  {
+    return 3;
+  }
+}
+
+#endif
+}}}
+
+{{{cpp: main.cpp:
+#include <fooblib.h>  // imported with angled brackets because its a third party library
+
+int someFcn(double)
+{
+  return 1:
+}
+
+int main()
+{
+  using namespace foo;
+  double return_1 { someFcn(0) };  // note we are using an int literal as an argument instead of a double (0.0)
+}
+}}}
+
+Now in this code the developer might be exoecting the `someFcn()` function call to return 1 as defined in his own userdeined function but it doesnt.
+this is because after using and importing the names in the `foo` namespace a naming collison occured and note that the `someFcn` declaration in foo
+allows an int to be taken as an argument unlike the userdefind one that takes a double (which would lead to type conversion), the compiler notices this
+and picks the best fit function for the function call, which in this case is the version from the third party library.
+
+This little experiment shows that the compiler picks the best fit function for a call if there are more than one declared functions with clashing
+identifers. THis could be easily avoided though by calling the `someFcn` using its qualified name with its namespace scope and scope operator, explicitly.
+
+calling it with:
+{{{cpp
+  foo:someFcn();  // third library version
+  someFcn();      // user defined version
+}}}
+
+would have pinpointed which function we wanted to call.
+
+- Finally, the lack of explicit scope prefixes make it harder for a reader to tell what functions are part of a library and what’s part of your program.
+
+[[The scope of using-declarations and using-directives]]
+
+they are blocked scoped, its imported names exist in the scope of the block they are called and expired as we leave that block.
+
+[[Cancelling or replacing a using-statement]]
+
+one definde cant be canclelled or replaced but its scipe can be limited with blocks.
+
+{{{cpp
+int main()
+{
+  {
+    using namespace foo;
+    // call foo stuff here
+  } // foo goes out of scope here
+
+  {
+    using namespace goo;
+    // calls goo stuff here
+  } // goo goes out of scope here
+
+  //  normal scope without any of goos or foos names imported but objects residing here likely altered by computations that occured
+  //  in foo and goos block.
+}
+}}}
+
+Of course, all of this headache can be avoided by explicitly using the scope resolution operator (::) in the first place.
+
+- Prefer explicit namespaces over using-statements. Avoid using-directives whenever possible. Using-declarations are okay to use inside blocks.
+
+[[Unnamed and inline namespaces]]
+
+unamed namespaces or anonymous namespaces are namespaces declared without a name, they are use to grant identifiers internal linkage,
+just like he static keyword, and can be called without the scope operator.
+
+{{{cpp
+#include <iostream>
+
+namespace
+{
+  void doSomething()
+  {
+    std::cout << "something is being done\n";
+  }
+}
+
+int main()
+{
+  doSomething();
+}
+}}}
+
+it is usually used when we have alot of identifiers we want internally linked. instead of using the static keywords numerously.
+unamed namespaces are accessible from their parent scope.
+
+[[Inline namespaces]]
+
+inline namespaces are usually for version controlling and adding new functionality without affecting backwards compatibility by
+making old functions obselete (by reformatting them). They dont affect linkage.
+
+{{{cpp
+#include <iostream>
+
+inline namespace V1
+{
+  void doSomething()
+  {
+    std::cout << "V1\n";
+  }
+}
+
+namespace V2
+{
+  void doSomething()
+  {
+    std::cout << "V2\n";
+  }
+}
+
+int main()
+{
+  V1::doSomething(); // calls the V1 version of doSomething()
+  V2::doSomething(); // calls the V2 version of doSomething()
+
+  doSomething();     // calls the inline version of doSomething() (which is V1)
+
+  return 0;
+}
+}}}
+
+now if this was an exisiting program functionlities that depended on the V1 can still be acessed without any issues, and newer functionality
+can be added byt useing the V2 namespace, because V1 was made inline any call to the `doSomething()` function would refer to V1 even without
+explicitly stating the namespace scope it belongs to.
+
+inline namespaces add a sort of version controlling to c++, allowing backward compatibility to legacy codebase and adding new functionlities
+which can share the same identifier with identifiers in the legacy codebase  (had the same functionality but not updated) but act independently.
+
+the namespace marlked inlinr wpuld be the default namespace referred to when the scope operator is not used.
+
+[[Mixing inline and unnamed namespaces ]]
+
+either by nesting or full-out conjoined declaration: they are used to grant both internal linkage and version controlling.
+
