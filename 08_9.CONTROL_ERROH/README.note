@@ -780,4 +780,109 @@ not actually need a random seeds to spawn differnt outputs what it needs precise
 
 [[Seeding with the system clock]]
 
+the system clock can be used as changing seed whem instatiating a misernne twister, but the units of time measuremnet must be very small, messured in ticks;
+how this works is that some function in the `<chrono>` header retrieves the time exuded after the earliest time recorded. ticks are really small
+like in nano-seconds or milli-seconds: they are then used as seed to instantiate the PRNGs. the reason they are so small is to prevent being seeded with the same seed
+after successive calls to the PRNG has been made with little time differences.
+
+example:
+{{{cpp
+#include <isotream>
+#include <random>
+#include <chrono>
+
+int main()
+{
+  std::mt19937 mt{ static_cast<std::mt19937::result_type> (std::chrono::steady_clock::now().time_since_epoch().count()) };
+  std::uniform_int_distribution die6{1, 6};
+
+  for (int count{ 1 }; count <= 50; ++count)
+  {
+    std::count << die6(mt) << '\t';
+
+    if (count % 10 == 0)
+      std::cout << '\n';
+  }
+  return 0;
+}
+}}}
+
+the above program gives us access to the clock using the `<chrono>` header and it allows us to seed the mt using the current time on our system.
+
+the downside of this approach is that if the succesive calls are called almost immediateley with no or incredibly minute time discrepancies, it might yield the same result
+which can be a problem for statistical computations and models but not for normal random computations.
+but for programs that require high quality, independent results, this method of seeding may be insufficient.
+
+<!--BUG: ALL MY FUCKING NOTES FROM HERE ARE GONE FUVK! -->
+
+any how ill just continue.
+
+[[Random numbers across multiple functions or files (Random.h)]]
+
+this is done with namespaces and inline variables in the header file.
+read up the details heres ince the notes where lost: [[http://www.learncpp.com/cpp-tutorial/generating-random-numbers-using-mersenne-twister/#RandomH]]
+
+{{{cpp: random.h
+#ifndef RAND_H
+#define RAND_H
+
+#include <chrono>
+#include <random>
+#include <iostream>
+
+// create namespace that PRNG will be acessed from
+namespace Random
+{
+  // create seed generator
+  inline std::mt19937 generateSeed()
+  {
+    std::random_device rd{};
+    std::seed_seq ss{
+      static_cast<std::seed_seq::result_type>(std::chrono::steady_clock::now().time_since_epoch().count()),
+      rd(), rd(), rd(), rd(), rd(), rd(), rd()
+    };
+    return std::mt19937{ ss };
+  }
+
+  // create static single global PRNG
+  inline std::mt19937 mt{ generateSeed() };
+
+  // create get function to get random numbers with limits
+  inline int get(int min, int max)
+  {
+    return uniform_int_distribution{min, max}(mt);
+  }
+
+  // template version of get function for arguments that are not types int, where T is the type.
+	template <typename T>
+	T get(T min, T max)
+	{
+		return std::uniform_int_distribution<T>{min, max}(mt);
+	}
+
+  // template version that converts arguments of differnt type (min and max diff. types) to one type and return in the converted type.
+	template <typename R, typename S, typename T>
+	R get(S min, T max)
+	{
+		return get<R>(static_cast<R>(min), static_cast<R>(max));
+	}
+}
+
+#endif
+}}}
+
+ussage:
+{{{cpp: main.cpp
+#include "random.h"
+
+int main()
+{
+  for(int count{ 1 }; count <= 40; ++count)
+  {
+    std::cout << random::get(1, 20) << '\t';
+    if (count % 10)
+      std::cout << '\n';
+  }
+}
+}}}
 
