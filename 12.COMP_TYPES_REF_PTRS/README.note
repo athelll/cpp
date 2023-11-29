@@ -1,6 +1,484 @@
+=       NOv 24, 2023 Felix Okoronkwo      =
 = Compound Types: References and Pointers =
-= NOv 24, 2023 Felix Okoronkwo =
 
-== Compound data types ==
+===================
+Compound data types
+===================
 
-thus a datatyoes that can be constructed from fundamental data types(or other compound data types)
+this are datatypes that can be constructed from fundamental data types(or other compound data types)
+
+C++ supports the following compound types:
+1) [[Functions]]
+2) [[Arrays]]
+3) [[Pointer Types:]]
+  * Pointer to object
+  * pointer to function
+4) [[Pointer to member types]]:
+  * Pointer to data member
+  * pointer to member function
+5) [[Reference Values]]:
+  * L-value references
+  * R-value references
+6) [[Enumerated types]]:
+  * Unscoped enumerations
+  * Scoped numerations
+7) [[Class Types]]:
+  * Structs
+  * Classes
+  * Unions
+
+
+======================================
+Value categories (lvalues and rvalues)
+======================================
+
+Besides producing side-effects, expressions can do on more thing: evaluate to objects or functions.
+
+Properties of an expression
+---------------------------
+to determine how an expression should evaluate and where they can be used an exoression posses to attributes: a `value` and `type` category.
+
+the type of an expression results from the type of the value, object or function that results from its evaluation.
+note that type of an expresson must be determinable at compile time or else tyoe checking and tyoe deduction will not work.
+However the value can be determined at runtime (or compile in the case of constexpr expressions.)
+
+The value category of an expression
+-----------------------------------
+
+consider this code:
+{{{cpp
+int main()
+{
+  int x{ 8 };
+  x = 8;                    // this is fine
+  8 = x;                    // error.
+}
+}}}
+
+int the above example we can see that its fine assigning an int value to the variable `x` but why can we assign `x` to an int literal? how does the
+compiler know what assignement is right? this is were the `value category` or expressions comes in play.
+
+the `value category` of an expression checks if an expression evaluates to a function, value or object of some sort.
+peior to c++11 there were only 2 possible value categories:
+1) lvalues
+2) rvlues
+
+in c++11, three additional value categories where added:
+1) glvalue
+2) prvalue
+3) xvalue
+this was all to support a new feature called `move semantics`.
+
+[[Lvalue and rvalue expressions]]
+
+lvalues
+-------
+an lvalue (or `left value` or `locator value`) is a value that evaluates to an identifiable object, function or bitfield.
+
+the term `idenity` is used loosely in c++, for clarification: an identity makes an entity differerntiable from other similar entities.
+an entity with an identity can be referred to with an identfier, reference or pointer and typically have an lifetime longer than that of a single expression.
+
+lvalues come in 2 subtypes: `modifiable` and `non-modifiable` lvalues(consts and constexprs).
+
+rvalues
+-------
+rvalues also known as right values is an expression that is not an lvalue. Commonly ssen rvalues include literals (except C-style strings which ar lvalues)
+and the return value of function and operators that return by value.
+Rvalues arent identifiable (meaning they hav to be used immediately) and are only used in the scope of the expression they are used.
+
+{{{cpp
+int return5()
+{
+  return 5;
+}
+
+int main()
+{
+  int x{ 5 };                             // 5                    is an rvalue
+  const double d{ 1.2 };                  // 1.2                  is an rvalue
+
+  int y { x };                            // x                    is a modifiable lvalue
+  const double e { d };                   // x                    is a non-modifiable lvalue
+  int z { return5() };                    // return5()            is an rvalue expression.
+
+  int w { x + 1 };                        // x+1                  is an rvalue
+  int q { static_cast<int>(d) };          // static_cast<int>(d)  evaluates to an rvalue: casts to not modify the object they work on.
+
+  return 0;
+}
+}}}
+
+and this is why we cant `8 = x` in pur previous example, for clarity: the `=` operator requires the left operand to be a modifiable lvalue and the right an rvalue expression.
+
+Tip on determining if a value is an lvalue or rvalue
+----------------------------------------------------
+the `&`operator compiles if used beside an lvalue and does not with an rvalue;:
+{{{cpp
+
+int foo()
+{
+  return 6;
+}
+int main()
+{
+  int x{6};
+  &x;                       // compiles:                 lvalue expression
+  &6;                       // does not compile:         rvalue expression
+  &foo();                   // does not compile:         rvalue expression
+}
+}}}
+
+Lvalue to rvalue conversion
+---------------------------
+lvalues implicilty converts to rvalues thats why they can be used where rvalues can be used:
+{{{cpp
+int x{ 7 };
+int y{ 5 };
+
+y = x;                    // this is fine because of lvalues implicit comversion to rvalues: in this case x was converted.
+x = x + 1;                // also valid due to the reason above.
+}}}
+
+A rule of thumb to identify lvalue and rvalue expressions
+---------------------------------------------------------
+- lvalue expressions evaluates to an identfiable object that persists beyond the lifetime of the expression
+- rvalues expressions evaluates to anonymous literals that their lifetime ends at the end of the expression
+
+
+=================
+LVALUE REFERENCES
+=================
+
+In C++ a reference is an alias for an existing object. A reference is essentially identical to the object being referenced.
+that mean we can use refernces to read and modify objects being referneced.
+
+you can also create refernece to functions.
+
+modern c++ contains 2 types of refernces:
+1) lvalue references
+2) rvalue references
+
+Lvalue reference types
+----------------------
+an lvalue reference is a refernence that acts as an alias for an existing lvalue such as a variable.
+
+to declare an lvalue reference type use an ampersand in its decleration:
+{{{cpp
+int             // normal int type
+int&            // a reference to an int object
+double&         // a reference to a double object
+}}}
+
+Lvalue reference variables
+--------------------------
+one thing we can do with lvalue refernces is to create an `lvalue refernce variable`: a variable that acts as a reference to an lvalue object.
+{{{cpp
+int main()
+{
+  int x{ 9 };
+  int& ref{ x };                // lvalue reference variable: reference to the lvalue x.
+}
+}}}
+
+Modifying values through an lvalue reference
+--------------------------------------------
+we use refernces just as we use the variables we refernece them with:
+{{{cpp
+#include <iostream>
+
+int main()
+{
+  int x{ 9 };
+  int& ref{ x };
+
+  std::cout << ref << '\n';                   // prints 9
+  ref = 10;
+  std::cout << x << '\n';                     // prints 10
+  x = 11;
+  std::cout << ref << '\n';
+}
+}}}
+
+Initialization of lvalue references
+-----------------------------------
+much like constants, references must be initialized.
+{{{cpp
+int main()
+{
+  int& invalidRef;                          // error: references must be initialized.
+
+  int x{ 5 };
+  int& ref{ x };                            // this is legal.
+
+  const int seven{ 7 };
+  int invalidRef{ seven }                   // references cannot bind to a non-modifiable value.
+}
+}}}
+
+when a refernces is initialized with an object or function we say its bound to that object or function: this process is known as `reference binding`
+the object or function being referenced is sometimes called the `referrent`.
+
+Lvalue refernces must be bound to a modifiable lvalue.
+referecnces cant be bound to non-modifiable l or rvalues because well be able to modify them through the references and therefore destroying the `const` nature
+of unmodifiable lvalues (or rvalues).
+
+refernces only refernces objects of the same type as itself (there are exceptions tho).
+lvlaue refernces to void are illegal(what would be the point?).
+
+{{{cpp
+int main()
+{
+  int x{ 5 };
+  int& ref{ x };                // okay: same type
+
+  double y{ 8.2 };
+  int& invalidRef{ y };         // ilegall: can't bind to an object with differnt type.
+}
+}}}
+
+References can’t be reseated (changed to refer to another object)
+-----------------------------------------------------------------
+once an references is binded to an object it cant be reseated: meaning that it cant be changed to references another object.
+{{{cpp
+#include <iostream>
+
+int main()
+{
+  int x { 5 };
+  int y { 7 };
+
+  int& ref { x };
+
+  ref = y;                  // legal: but some might expect ref to bind to x as its new reference, but it doesn not. it assignes the value of x to y.
+}
+}}}
+
+Lvalue reference scope and duration
+-----------------------------------
+reference follow the same scoping and duration that normal variables do:
+
+References and referents have independent lifetimes
+---------------------------------------------------
+they both have independent lifetimes meaning:
+1) A refernces can be desrtoyed before its referent.
+2) An object being referenced can be destroyed before its reference.
+
+{{{cpp
+int main()
+{
+  int x{ 8 };
+
+  {
+    int& ref{ x };
+    ++ref;
+  } // ref dies here and x is oblivous.
+
+  std::cout << x << '\n';
+} // x dies here.
+}}}
+
+Dangling references
+-------------------
+when an object is destroyed before its reference, it yields a `dangling reference`: that is a reference that is binded to a non existent object.
+Accessing a dangling reference leads to undefined behaviour.
+
+they are fairly easy to avoid tho: will be discussed later.
+
+References aren’t objects
+-------------------------
+its not an object homie.
+
+
+==========================
+Lvalue references to const
+==========================
+
+Introduction
+------------
+we can make lvalue references bind to a non-modifiable lvalue by declaring the reference with the const keyword:
+{{{cpp
+const int x{ 9 };
+const int& ref { x };                 // lvalue reference to a const: legal with the const keyword.
+}}}
+
+sine they are binded to const they can only be used to access not modify.
+
+Initializing an lvalue reference to const with a modifiable lvalue
+------------------------------------------------------------------
+when we do this since the ref is declared to be constant we can only access the modifiable lvalue: we cannot modify the lvalue via its const reference
+the lvalue tho is still modifiable with its own identifier.
+
+Initializing an lvalue reference to const with an rvalue
+--------------------------------------------------------
+when this happens an anonymous object is created (initialized with the rvalue) and its accessible with the ref.
+Temporary objects have no scope because they have no identifier (and scope is a property of identfiers).
+
+but the thing is thet references outlive the lifteime of temporary objects ans subject the temporary objects they are binded to inherit the same lifespan the
+references themselves have (which is `block scope` with `automatic duration`)
+
+{{{cpp
+int main()
+{
+  const int& ref{ 5 };                // anonymous object binded to const reference ref. lifrtime extended to match ref.
+  // do stuff with ref here
+  return 0;
+} // anonymous object with value 5 and ref dies here.
+}}}
+
+note:
+- lvalue references can only bind to modifiable lvalues
+- const lvalue references csn bind, modifiable lvalues, non-modifiable lvalues and rvalues. makes them more flexible.
+
+Constexpr lvalue references
+---------------------------
+when applied to a reference, constexpr alloes refereces to be used in constant expressions.
+they do have a limitation tho: they can `only` be binded to objects with static duration(either globals or static locals).
+this is because static objects address in memory are known by the compiler at compile time so it can access it at compile time.
+
+they cannot be binded to local variables because their addresses are not known until the function they are scoped in is called, which the local variables are then
+instantiated to have addresses.
+{{{cpp
+int g_x{ 5 };
+
+int main()
+{
+  [[maybe_unused]] constexpr int& ref1 { g_x };   // okay: global variables are static in nature
+
+  static int s_x{ 10 };
+  [[maybe_unused]] constexpr int& ref2 { s_x };   // okay: s_x is a static local variable.
+
+  int x{ 15 };
+  [[maybe_unused]] constexpr int& ref3 { x };     // illegal: x is not static.
+}
+}}}
+
+when defining a constexpr reference to a static const variable we need to apply both the constexpr and const keywords to the variable:
+{{{cpp
+static const int s_cx { 10 };
+[[maybe_unused]] constexpr const int& ref { s_cx };
+}}}
+
+========================
+Pass by lvalue reference
+========================
+
+wen calling function passing in arguments to the function for the values to be copied, modified and returned can be expensive, especially when the modification
+and return is to modify a variable that belonged to the callers scope.
+
+this issue is addressed easily with addresses.
+
+Normal function calls
+---------------------
+now consider a case where we want to call a function to modify a value in the callers scope we mught do something like this with normal argument passing:
+{{{cpp
+#include <iostream>
+
+void plusOne(int x)
+{
+  x++;                      // 2) x is incremented but not that of the callers: they are independent
+} // 3) x dies here with its change
+
+int main()
+{
+  int x { 1 };
+  plusOne(x);               // 1) the value in variable x is copied into int x of plus one: both are now independent variables with the same value
+  std::cout << x << '\n';   // 4) no change to x: x remains the same
+}
+}}}
+
+due to function calls having parrallel scopes (independent scopes), we cannot ordinarily pass a value in one function to another and expect the function
+to modify the passed in variable from its caller in its scope (scope of the called function).
+
+in actually what we are doing is just copying values from one function to another with the constraint that the copied argument is independent from that of the initial
+one (from the caller function) despite both having the same value, which is kinda wasteful if you think about it
+
+an int vairable in the main function occupying 8 bytes passed it into the plusOne funtction as a parameter, the plusOne function creates a seperate int variable of its own,
+and copies the value of the initial variable passed into it. after initializing its own int variable with the value of the initial int passed in, it has no business with its
+callers int anymmore and leaves it alone.
+
+now we have 2 int variables: one int in the plusOne and another in the main and both of them having the same value making a total of 16bytes of memory.
+which is inefficient and wasteful since both have the same value and one could just be used for any computations we wanted to execute.
+
+one of the solution to this problem is: `pass by reference`.
+
+Pass by reference
+-----------------
+with pass with reference we can just use one object modify or utilize it another functions scope and have the modifed effect reflect in in the callers function scope.
+this prevenets us form making expensive copies.
+
+inexpesive argument passing:
+{{{cpp
+#include <iostream>
+#include <string>
+
+void printValue(std::string& y)
+{
+  std::cout << y << '\n';
+} // y is destroyed
+
+int main()
+{
+  std::string x { "Hello Cuck Suckers!" };
+  printValue( x );                              // inexpensive because x is passes into a reference so no duplication occurs.
+}
+}}}
+
+modified argument reflecting in callers function:
+{{{cpp
+#include <iostream>
+
+int plusOne(int& x)
+{
+  ++y;                      // modifies the object that y is referencing which is main() x.
+}
+
+int main()
+{
+  int x { 0 };
+
+  std::cout << x << '\n';
+  plusOne(x);
+  //x has been modified.
+  std::cout << x << '\n';
+}
+}}}
+
+Pass by reference can only accept modifiable lvalue arguments
+-------------------------------------------------------------
+Because a reference to a non-const value can only bind to a modifiable lvalue. so no const or literals.
+
+
+==============================
+Pass by const lvalue reference
+==============================
+
+a reference to a const can bind to any type of value, lvalues (modifiable and non), rvalues and literals. making it more favourable ot use than its counterpart.
+Passing by const reference offers the same primary benefit as pass by reference (avoiding making a copy of the argument), and the function cant change the value
+being referenced.
+
+this is not allowed:
+{{{cpp
+void addOne(const int& ref)
+{
+  ++ref; // not allowed: ref is const
+}
+}}}
+
+NOTE:
+----
+Favor passing by const reference over passing by non-const reference unless you have a specific reason to do otherwise
+(e.g. the function needs to change the value of an argument).
+
+When to pass by (const) reference
+---------------------------------
+1) class types are usually passed by const reference instead of by value to avoid making an expensive copy of the argument.
+2) pass fundamental types by value, and class (or struct) types by const reference.
+3) Prefer pass by value for objects that are cheap to copy, and pass by const reference for objects that are expensive to copy.
+   If you’re not sure whether an object is cheap or expensive to copy, favor pass by const reference.
+
+NOTE:
+----
+- pass by refrence is generally slower than passing by value but in cases where the object being passed is cheap to copy.
+- An object is cheap to copy if it uses 2 or fewer “words” of memory (where a “word” is approximated by the size of a memory address)
+  and it has no setup costs.
+
