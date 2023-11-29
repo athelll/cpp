@@ -8,21 +8,21 @@ Compound data types
 this are datatypes that can be constructed from fundamental data types(or other compound data types)
 
 C++ supports the following compound types:
-1) [[Functions]]
-2) [[Arrays]]
-3) [[Pointer Types:]]
+1) Functions
+2) Arrays
+3) Pointer Types:
   * Pointer to object
   * pointer to function
-4) [[Pointer to member types]]:
+4) Pointer to member types:
   * Pointer to data member
   * pointer to member function
-5) [[Reference Values]]:
+5) Reference Values:
   * L-value references
   * R-value references
-6) [[Enumerated types]]:
+6) Enumerated types:
   * Unscoped enumerations
   * Scoped numerations
-7) [[Class Types]]:
+7) Class Types:
   * Structs
   * Classes
   * Unions
