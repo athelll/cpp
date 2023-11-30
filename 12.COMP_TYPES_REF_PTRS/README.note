@@ -478,7 +478,265 @@ When to pass by (const) reference
 
 NOTE:
 ----
-- pass by refrence is generally slower than passing by value but in cases where the object being passed is cheap to copy.
+- pass by refrence is generally slower than passing by value but in cases where the object being passed is expensive to copy use it.
 - An object is cheap to copy if it uses 2 or fewer “words” of memory (where a “word” is approximated by the size of a memory address)
   and it has no setup costs.
+
+The cost of pass by value vs pass by reference
+----------------------------------------------
+thus us a helper macro that tells if a datatype is cheap to copy:
+{{{cpp
+#include <iostream>
+
+#define isSmall(T) (sizeof(T) <= 2*sizeof(void *))  // this is the helper macro
+
+struct S
+{
+  double a;
+  double b;
+  double c;
+}
+
+int main()
+{
+  std::cout << std::boolalpha;
+  std::cout << isSmall(int);            // yes: favoue pass by value
+  std::cout << isSmall(double);         // yes: favour pass by value
+  std::cout << isSmall(S);              //  no: favour const referencing.
+}
+}}}
+
+For function parameters, prefer std::string_view over const std::string& in most cases
+--------------------------------------------------------------------------------------
+this is because `std::string_view` can handle a wider variety of string inputs ans its less expensive.
+
+
+========================
+Introduction to pointers
+========================
+
+- in C++: normal pointers (pointers inherited from C) are known as dumb pointers
+
+Pointer initialization
+----------------------
+{{{cpp
+int main()
+{
+  int x{ 5 };
+
+  int* ptr;         // unitialized pointer holds garbage address
+  int* ptr_1{};     // a null pointer
+  int* ptr_1{ &x }; // initialized pointer pointing to x.
+}
+}}}
+
+pointers can only point to types that are the same with the type they are.
+pointers cant be initialized with literal values or addresses-like-values they will be treated as ints or other fundamental types
+and not an address.
+
+Pointers and assignment
+-----------------------
+we can use the assignement operator on pointers for 2 uses:
+1) To change the value of the address that the pointer is pointing to.
+2) to change the value being pointed at (by assigning the dereference operator)
+
+{{{cpp
+int x{ 6 };
+int y{ 7 };
+int* ptr{ &x };                 // pointer initialized to point to x
+ptr = &y;                       // pointer now points to y
+*ptr = 10                       // pointer has now changed the value stored in y by dereferencing.
+}}}
+
+Similarities and differences of pointers and references
+-------------------------------------------------------
+1) References must be initialized; Pointers on the other hand dont have to be initialized ( but they should )
+2) References cannot be reaseted; pointers can
+3) References are usually safe (except when dangling); pointers are inerently dangerous
+4) References are not objects; pointers are
+5) References must always be bound to an object, pointers can point to nothing.
+
+6) THey are bothe used for accessing and modifying an object.
+
+The address-of operator returns a pointer
+-----------------------------------------
+the address operator is mistaken to return a hexadecimal address but in actuality what happens is that the address is converted to a pointer housing that address
+and that is what is returned back.
+{{{cpp
+#include <iostream>
+#include <typeinfo>
+
+int main()
+{
+  int x{ 4 };
+  std::cout << typeid(&x).name() << '\n';   // this prints `Pi` or `int *` deending on your compiler
+  return 0;
+}
+}}}
+
+The size of pointers
+--------------------
+the size of a pointer depends on the architecture the executable is being compiled on: since pointers are just memory addresss they take up the word length
+that the arcitecture itself uses to process, store and refer to data. If you're on a 64 bit machine, processing data in memory 64 bits at a time, it will make sense that the
+size of memory address the architecture refers to are 64bits is size: thus making the size of pointers 64bits in size also.
+
+same rationale with 32 bits systems.
+
+the size of a pointer is constant depsite the type it points to because in essence a pointer is merely just an address and the number of bits needed to access a memory address
+is constant.
+
+Dangling pointers
+-----------------
+A dangling pointer is a pointer holding the address of an object that is no longer valid. Dereferncing a dangling pointer will lead to UB or maybe a seg fault.
+
+
+=============
+Null pointers
+=============
+
+beides objects address theres one additional value pointers can hold and that is a `null value`. a null value (or simply null) is a value that means something has no value.
+when a pointer is holding a null value it means that the pointer is pointing to nothing. easiste way ot create a null pointer is using value initialization:
+{{{cpp
+int main()
+{
+  int* ptr{};             // null pointer, its holds no address
+  return 0;
+}
+}}}
+
+value initialize your pointer it be null unless initualizing them with a valid address.
+
+The nullptr keyword
+-------------------
+the `nullptr` keyword represents a noil pointer literal. we use it to explicitly initialize a null pointer.
+{{{cpp
+int main()
+{
+  int* ptr { nullptr };     // null pointer
+  int x { 5 };
+  int* ptr2 { &x };         // another pointer: not null
+  ptr2 = nullptr;           // now null
+
+  someFunc(nullptr);        // we can also use the nullptr for arguments that require a pointer.
+  return 0;
+}
+}}}
+
+Dereferencing a null pointer results in undefined behavior
+----------------------------------------------------------
+dereferncing a null pointer leads to UB that should crash the program (usually with a seg fault): you can try it with this snippet:
+{{{cpp
+#include <iostream>
+
+int main()
+{
+  int* ptr{};
+  std::cout << "crashe-" << *ptr << '\n'
+}
+}}}
+
+Checking for null pointers
+--------------------------
+1) method 1: explicitly compare with the nullptr literal keyword.
+
+{{{cpp
+int* ptr{};
+
+if (ptr == nullptr)
+  // do stuff
+else
+  // okay its not null so do stuff
+}}}
+
+2) method 2: null pointers evaluate to false so placing them in a conditional like that should evaluate to tell you if its null or not.
+
+{{{cpp
+int* ptr{};
+
+if (ptr)
+  // its null do something
+else
+  // its not null do another thing
+}}}
+
+Legacy null pointer literals: 0 and NULL
+----------------------------------------
+0 and `NULL` are used in legacy code to initialize null pointers:
+{{{cpp
+int main()
+{
+  int* ptr { NULL };           // this is a null pointer: not advisable tho
+  int* ptr2;                   // unitiaized: holds garbage address
+  ptr2 = 0;                    // now a null pointer: not advisable
+}
+}}}
+
+NOTE:
+----
+on modern arcitectures the address is used to represent a null pointerL this constraint was not created by c++ (it was done by computer designers)
+so it may not be consistent on all architectures (they might be uding other values ot represent null pointers).
+
+both 0 and `NULL` should be avoided in c++L use nullptr instead this will be explained later.
+
+Favor references over pointers whenever possible
+------------------------------------------------
+This is because references are safer than pointers (which can be extremely dangerous when dangling).
+
+
+==================
+Pointers and const
+==================
+
+prevously we initilizie pointers to address to mutable objects what of const non-mutable objects?:
+{{{cpp
+int main()
+{
+  const int x{ 5 };
+  int* ptr{ &x };                   // error.
+}
+}}}
+
+we would expect thus to works but it doesnt because we can assigne the address of a `const int` to a pointer that points to `int`: becuae logically we should
+be able to defer and manipulate what `int` we are pointing to but thats not that case, because we arent pointing to an `int` we are pointing to a `const int`
+which is not the same and violates the constness of the varibale.
+
+to fix this we use the const keyword before the `int` to declare a pointer to a `const int` not just `int`:
+{{{cpp
+int main()
+{
+  const int x{ 5 };
+  const int* ptr{ &x };              // legal
+}
+}}}
+
+this applies to any datatype.
+
+Const pointers
+--------------
+
+in the above examples although made pointers to `const int` we didnt declare that they cant point to other `const ints`: this is because we simply decared a pointer that
+should legally point to any `const int` object, therefore it can be resaeted and point to as many objects as it can as long as the object is of type `const int`
+
+to declare a pointer that cannot point to a differnt object after initialized we need to declare a `const pointer` to do this we use the const keyword after the
+asterisks in the pointers declaration:
+{{{cpp
+int main()
+{
+  int x{ 5 };
+  int* const ptr{ &x };             // now ptr cannot be assigned to another address: a const pointer.
+}
+}}}
+
+although since, in this example, the datatype it points to is a non-const int, it can be derefernced and have its value changed.
+
+Const pointer to a const value
+------------------------------
+they point to const datatypes and cannot be resaeted:
+{{{cpp
+const int x { 8 }
+const int* const ptr { &x };        // example of a const pointer to a const value of type int.
+}}}
+
+Pass by address
+---------------
 
