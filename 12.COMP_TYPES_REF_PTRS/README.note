@@ -739,4 +739,372 @@ const int* const ptr { &x };        // example of a const pointer to a const val
 
 Pass by address
 ---------------
+c++ provides another method of passing in arguments that isnt by reference or by value: and this is passing by `address`.
+{{{cpp
+#include <iostream>
+
+void someFcn(double* x)
+{
+  ++(*x);                   // this should increment the value passed by address in the callers scope
+}
+
+int main()
+{
+  double num{ 9.0 };
+  someFcn(&num);
+}
+}}}
+
+passing arguments by address prevents object duplication which saves memory footprint in a program: because we use pointers to refer to the objects
+we can also derefernce the object and modify its value. like in the example above.
+
+Pass by address does not make a copy of the object being pointed to
+-------------------------------------------------------------------
+passing by address does not make a copy of the object being passed as an argurment as stated above it simply derefernces the original object
+thereby reducing memory footprint.
+
+Null checking
+-------------
+obeserving this simple program one mighy not even recongnize a fault in its design:
+{{{cpp
+#include <iostream>
+
+void print(int* ptr)
+{
+	std::cout << *ptr << '\n';
+}
+
+int main()
+{
+	int x{ 5 };
+	print(&x);
+
+	int* myPtr {};
+	print(myPtr);
+
+	return 0;
+}
+}}}
+
+thsi progran will only print 5 and then crash: this is because we didnt `null check`: null checking is a precaution we impleent to make sure a pointer isnt `wild`
+or `null` (simply its to check if a pointer is not null). we can edit the above code with null checking into:
+{{{cpp
+void print(int *ptr)
+{
+  // null check here: at the entry of the function
+  if(!ptr)
+    return;
+  //else
+  std::cout << *ptr << '\n';
+}
+
+int main()
+{
+  int x{ 5 };
+	print(&x);
+
+	int* myPtr {};
+	print(myPtr);
+
+	return 0;
+}
+}}}
+
+this way before the function executes its checked to prevent seg fault.
+
+we can also use the `assert()` function macro to assert if the the pointer is null and halt:
+{{{cpp
+void someFcn(int* ptr)
+{
+  assert(ptr);
+  // continue with shit here if it doesnt assert out here: if in debug mode
+
+  if(!ptr)
+    return; // precaution action incase not in debug mode.(production mode)
+}
+}}}
+
+Prefer pass by (const) reference
+--------------------------------
+reasons why passing by `const reference` is preferred to that of passing by address via pointers:
+1) they accept both rvalues and lvalues so its more flexible
+2) has a normal feel when used unlike with pointers that need to be derefernced with an additional symbol to be used (which sometimes cause confusion to new developers).
+
+Rule of Thumb:
+-------------
+use pass with reference when you can and use pass with address when you must.
+
+{{{cpp
+#include <iostream>
+
+void passByValue(int a)
+{
+  std::cout << a << '\n';
+}
+
+void passByReference(int& b)
+{
+  std::cout << b << '\n';
+}
+
+void passByAddress(int* c)
+{
+  std::cout << *c << '\n'
+}
+
+int main()
+{
+  passByValue(5);       // legal but makes a copy:                                            inefficient
+  passByReference(5);   // legal, refers to the same int literal 5, no memory duplication:    efficient
+  passByAddress(5);     // illegal: cant pass in rvalues into pointers                        should have been effeicent but impossible.
+}
+}}}
+
+
+========================
+Pass by address (part 2)
+========================
+
+Pass by address for “optional” arguments
+----------------------------------------
+one of the reasons that passing in address are for optional arguments, example:
+{{{cpp
+#include <iostream>
+
+void greet(std::string* name=nullptr)
+{
+  std::cout << "Hello";
+  std::cout << (name ? *name : "guest") << '\n';
+}
+
+int main()
+{
+  greet();                      // this is legal and takes the user as "guest"
+  std::string name { "Felix" };
+  greet(&name);                 // also works with a passed in string name (treating this argument as optional)
+  return 0;
+}
+}}}
+
+this could also be achieved by function overloading:
+{{{cpp
+void greet(std::string_view name)
+{
+  std::cout << "Hello" << name << '\n';
+}
+
+void greet()
+{
+  greet("Guest");
+}
+
+
+int main()
+{
+  greet(); // we don't know who the user is yet
+
+  std::string joe{ "Joe" };
+  greet(joe); // we know the user is joe
+
+  return 0;
+}
+}}}
+
+Changing what a pointer parameter points at
+-------------------------------------------
+we can achieve this by using double pointers that takes in the address of a pointer as an argument and from dereference it but this is C-isque, in C++
+this can be acieved by using a refeence to a pointer.
+
+Pass by address… by reference?
+------------------------------
+this is simply done by placing an ampersand symbol after the pointer type decaration as follows:
+{{{cpp
+void nullify(int*& refptr)
+{
+  refptr = nullptr;
+}
+
+int main()
+{
+  int x{ 5 };
+  int* ptr{ &x };
+
+  std::cout << "ptr is " << (ptr ? "not-null" : "null") << '\n';
+  nullify(ptr);
+  std::cout << "ptr is " << (ptr ? "not-null" : "null") << '\n';
+}
+}}}
+
+Why using 0 or NULL is no longer preferred (optional)
+-----------------------------------------------------
+the literal 0 can be interpreted as either a `int literal` or a `null pointer literal`. In certain cases it can be ambiguous of which one we intend to use.
+
+The defination of the macro NULL is not defined by the language standard. it can be defined as `0, 0L, ((void *) 0)`, or something else.
+this ambiguity can be fixed by using `nullptr`
+
+std::nullptr_t (optional)
+-------------------------
+if `nullptr` is not of type int, it is of type `std::nullptr_t` in the `<cstddef>` header and it can only hold one value: `nullptr`
+while it might seem slly: its useful in situation where we want the only argument a function accepts be the `nullptr` literal.
+{{{cpp
+#include <cstddef>
+#include <iostream>
+
+void print(std::nullptr_t)
+{
+  std::cout << "in print(std::nullptr_t)\n";
+}
+
+void print(int*)
+{
+  std::cout << "in print(int*)\n";
+}
+
+int main()
+{
+  print(nullptr);           // calls function: void print (std::nullptr_t)
+
+  int x{ 5 };
+  print(&x);                // calls function: int print (int*)
+}
+}}}
+
+
+=========================================
+Return by reference and return by address
+=========================================
+
+- The object being returned by reference must exist after the function returns
+- Don’t return non-const local static variables by reference
+- Assigning/initializing a normal variable with a returned reference makes a copy
+- It’s okay to return reference parameters by reference
+- It’s okay to return by const reference an rvalue passed by const reference
+- when a non const reference is returend from a function the caller can use the reference to modify the referent:
+{{{cpp
+#include <iostream>
+
+int& max(int& x, int& y)
+{
+  return (x > y ? x : y);
+}
+
+int main()
+{
+  int a{ 2 };
+  int b{ 5 };
+
+  max(a, b) = 10;
+  std::cout << a << ' ' << b << '\n';
+  return 0;
+}
+}}}
+
+Return by address
+-----------------
+i known this i know C.
+but return by reference should be preferred to that of return by address
+
+
+=====================
+In and out parameters
+=====================
+
+In parameters
+-------------
+they are mostly used for recieving inputs from the caller.
+
+Out parameters
+--------------
+they are function parameters (usualu const references or pointer arguments) that the function operates on with the aim of modifying the objects value: which in
+returns acts as an output for the caller.
+
+this provides a way for the function to return data back to its caller in scenarios where using its return will not be sufficient for some reason.
+exmple:
+{{{cpp
+#include <cmath>
+#include <iostream>
+
+void getSinCos(double degrees, double& cos_x, double& sin_x)
+{
+  constexpr double pi { 3.1415926535897932384 };
+  double radians = degrees * pi / 180;
+  cos_x = std::sin(radians);
+  sin_x = std::cos(radians);
+}
+
+int main()
+{
+  double sin{ 0.0 };
+  double cos{ 0.0 };
+
+  double degrees{};
+  std::cout << "Enter degrees: ";
+  std::cin >> degrees;
+
+  getSinCos(degrees, sin, cos);
+
+  std::cout << "Degrees: " << degrees << "\nCos: " << cos << "\nSin: " << sin << '\n';
+}
+}}}
+
+When to pass by non-const reference
+-----------------------------------
+if your going to use oaoss by referene to prevent making a copy of an argument: prefer passing by `const` reference excpet solid reason not to.
+like:
+1) First, use pass by non-const reference when a parameter is an in-out-parameter.
+2) use pass by non-const reference when a function would otherwise return an object by value to the caller
+
+
+===================================================
+Type deduction with pointers, references, and const
+===================================================
+
+things that type deduction drops:
+1) const and constexpr qualifiers
+2) and `REFRENCES`
+
+example:
+{{{cpp
+std:string& getStringRef()
+{
+  //
+}
+
+int main()
+{
+  auto ref{ getStringRef() };         // evaluates into std::string and drope the reference attribute.
+}
+}}}
+
+just like the const and constexpr they can be reapplied:
+{{{cpp
+std::string& getRef()
+{
+//
+}
+
+int main()
+{
+  auto& ref{ getRef };              // evaluates to std::string&
+}
+}}}
+
+Top-level const and low-level const
+-----------------------------------
+a `top-level const` qualifier that applies to the object itself.
+when it applies to the type its a low-level.
+
+{{{cpp
+// top-level const
+const int  a;                          // applies to the object so it top-level
+int* const b;                          // applies to the object also so its top-level.
+
+// low-level const
+const int& ref;                        // applies to the object being refrenced so low-level
+const int* ptr;                        // applies to the object being pointed to so low-level also.
+
+// both types of const.
+const int* const both;                 // both low and high level const itssss MEGA level!
+}}}
+
 
