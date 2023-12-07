@@ -1107,4 +1107,114 @@ const int* ptr;                        // applies to the object being pointed to
 const int* const both;                 // both low and high level const itssss MEGA level!
 }}}
 
+Type deduction and const references
+-----------------------------------
+first the reference attribute is dropped and then any top-level const is dropped from the result.
+{{{cpp
+#include <string>
+
+const std::string& getConstRef()
+{
+  //
+}
+
+int main()
+{
+  auto ref1{ getConstRef };               // refenceis dropped first, then any top level const: leaving std::string.
+}
+}}}
+
+if they are needed thye should be reapplied.
+
+NOte:
+----
+when you want a const reference, reapply the const qualifie even where uts nit strictly necassary to make your intentions clear
+
+What about constexpr references?
+--------------------------------
+they work the same way as const references
+
+Type deduction and pointers
+---------------------------
+unike references, tyoe deduction does not drop pointers.
+{{{cpp
+#include <string>
+std::string* getPtr();
+
+int main()
+{
+  auto ref{ getPtr() };               // deduces to type std::string*
+  // we can also use the * symbol to make our intentions clearer
+  auto* re_2 { getPtr() };            // std::string*
+}
+}}}
+
+The difference between auto and auto*
+-------------------------------------
+the difference between them is that with `auto*` what happens is that the value is first type evaluated normally, let say the arguments was `s"Hello"`,
+it sowuld evaluate sto type: `std::string`. After that the pointer symbol is reaplplied. makinf it a `pointer to x type`
+where `x` is a datatype
+
+there can be some isseus with `autu*` decalrations and one of them is illustrated below:
+{{{cpp
+#include <string>
+
+std:string* getPtr();     // some function that returns a pointer
+
+int main()
+{
+  auto ptr1  ( *getPtr() );                 // here a pointer is returned whic is then dereferenced leading auto to evaluate to std::string
+  auto* ptr1 ( *getPtr() );                 // here a pointer is returnd which is derefed to yeilding an std::string then the pointer attribute is applied
+  // making it evalue=ste to std::string* which cannot hold an std::string therefore compile error.
+}
+}}}
+
+the auto keywrod also drop reference attributes: if they are needed they have to be reapplied.
+
+Type deduction and const pointers Optional
+------------------------------------------
+ltes look and examine the code below:
+{{{cpp
+#include <string>
+
+std::string* getPtr();
+
+int main()
+{
+  const auto  ptr_1 { getPtr() };     // evaluates to std::string* const
+  auto const  ptr_2 { getPtr() };     // evaluates to std::string* const
+
+  const auto* ptr_3 { getPtr() };     // evaluates to const std::string*
+  auto* const ptr_4 { getPtr() };     // evaluates to std::string* const
+}
+}}}
+
+in the above code we see the only arragement where auto is evaluated as: `const std::string*` is the format: `const auto*`.
+the rest the pattern of arrngement is not followed and they are evaluated to `std::string* const`.
+
+NOTE:
+-----
+{{{cpp
+#include <string>
+
+int main()
+{
+  std::string s{};
+  const std::string* ptr { &s };
+
+  auto ptr1{ ptr };  // const std::string*
+  auto* ptr2{ ptr }; // const std::string*
+
+  auto const ptr3{ ptr };  // const std::string* const
+  const auto ptr4{ ptr };  // const std::string* const
+
+  auto* const ptr5{ ptr }; // const std::string* const
+  const auto* ptr6{ ptr }; // const std::string*
+
+  const auto const ptr7{ ptr };  // error: const qualifer can not be applied twice
+  const auto* const ptr8{ ptr }; // const std::string* const
+
+  return 0;
+}
+}}}
 
