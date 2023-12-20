@@ -1,4 +1,544 @@
 =       Felix Ikechukwu O. Dec 10, 2023       =
 = Introduction to object-oriented programming =
 
+Introduction
+--------------
+an object is a piece of memory to store values created to mimic a sort of model imbued with both properties and behaviours.
+
+Introduction to classes
+-----------------------
+structs provide a convinient package for storing and moving related data values.
+
+The class invariant problem
+---------------------------
+the biggest problem of structs us they provide ineffective ways to enforce or document class invariants.
+
+class invariants is a condition that must be true for objects spawned from a class to be remain in a valid state. an object that violates
+a class invariant is said to be in an invalid state. an unexpected or undefined behaviour may occur with further of that object.
+
+and relying on users or you the developer to handle class invariants can lead to problematic code. and so
+structs do not provide an elegant way of handle class invariants.
+
+Introduction to classes
+-----------------------
+a class is a program defined compound datatype that can have many memeber variables with different types.
+because its a program defined type it must be declared before its used.
+
+classes are similare to structs just that we use the `class` keyword instead of `struct` in its declaration:
+{{{cpp
+class Employee
+{
+  int m_id {};
+  int m_age {};
+  double m_wage {};
+};
+}}}
+
+example of a class date type:
+{{{cpp
+#include <iostream>
+
+class Date
+{
+public:
+  int m_day{};
+  int m_month{};
+  int m_year{};
+};
+
+void print_date(Date date)
+{
+  std::cout << date.m_day << '/' << date.m_month << '/' << date.m_year << '\n';
+}
+
+int main()
+{
+  Date today { 13, 12, 2023 };
+  print_date(today);
+  return 0;
+}
+}}}
+
+Most of the C++ standard library is classes
+-------------------------------------------
+C++ was originally named `C with classes`.
+
+
+Member functions
+================
+
+The separation of properties and actions
+----------------------------------------
+real life objects posses 2 features about them:
+1) observable properties (colour, mass, geometry, etc)
+2) number of actions they can perform (fly, bounce, move, etc.)
+
+in programming we represent peoperties with variables and actions with functions.
+we can provide class objects with `"actions"` using member functions in the class.
+
+Member functions
+----------------
+Functions that beloing to class tyoes are known as `member functions`.
+functions that are not member functions are known as `non-member functions` or occasonally `free functions` to distinguish them from member functions.
+they are declared inside a class defination (as a reminder a defination is alsp a declaration)
+
+A member function example
+-------------------------
+structs in c++ can have member functions:
+{{{cpp
+#include <iostream>
+
+struct Date
+{
+  int day{};
+  int month{};
+  int year{};
+
+  void print()
+  {
+    std::cout << day << '/' << month << '/' << year << '\n';
+  }
+};
+
+int main()
+{
+  Date today { 12, 12, 2023 };
+  ++today.day;
+  today.print();
+
+  return 0;
+}
+
+}}}
+
+Calling member functions (and the implicit object)
+--------------------------------------------------
+all non-static mmeber function must be called using an object of the class type the member function belongs to: where it can then access the member variables in the object
+(if needed) to exeute the call.
+
+the objects the member function is called on is `implicitly` passed into the member function execution. for this reason the object that the member is called on is often
+called `the implicit object`.
+
+in other words: in the above function the call `today.print()`, `today` is an implicit function that is passed into the `print()` function.
+
+Accessing members inside a member function uses the implicit object
+-------------------------------------------------------------------
+in a member function any member identifier not prefixed with the member selection operator (.) is associated with `the implicit object` (the objects itself).
+
+Another member function example
+-------------------------------
+{{{cpp
+#include <iostream>
+#include <string>
+
+struct Person
+{
+  std::string name {};
+  int age{};
+
+  void kissed(Person& person)
+  {
+    std::cout << name << " kissed " << person.name << '\n';
+  }
+};
+
+int main()
+{
+  Person felix { "felix", 21 };
+  Person nobody { "nobody", -1 };
+
+  felix.kissed(nobody);
+
+  return 0;
+}
+}}}
+
+Member variables and functions can be defined in any order
+----------------------------------------------------------
+for non-member functions the order of declaratiosn matters which is why you cant call  function that hasnt been declared but this limitation does not apply for
+member function the order doesnt metter as long as the function to be called will still be defined in the class types declearation.
+
+this is because due to member function being part of a program defined type (class types) that the compiler must always be aware before usage: the compiler already has
+a snapshot of all member variables and functions declared in the class type so as long as its declared the compiler will be aware. unlike non-member functions that might
+be declared in another trasnslation unit needing a forward declaration to make the compiler aware of it (although its externaly linked).
+
+{{{cpp
+struct Foo
+{
+  int m_x { z() };          // okay to call z() here even tho its not declared: because it still would be
+  int m_y { z() };          // same thing as above
+  int z() { return 5 };     // declared.
+};
+}}}
+
+Member functions can be overloaded
+----------------------------------
+just like non-member functions member function can be overloaded.
+{{{cpp
+#include <iostream>
+#include <string>
+
+struct Date
+{
+  int m_day   {};
+  int m_month {};
+  int m_year  {};
+
+  void print()
+  {
+    std::cout << m_day << '/' << m_month << '/' << m_year << '\n';
+  }
+
+  void print( std::string& prefix )
+  {
+    std::cout << prefix << m_day << '/' << m_month << '/' << m_year << '\n';
+
+  }
+};
+
+int main()
+{
+  Date today { 14, 12, 2023 };
+
+  today.print();                      // calls Date::print()
+  std::cout << '\n';
+
+  today.print("The date is: ");       // calls Date::print(std::string_view)
+  std::cout << '\n';
+}
+}}}
+
+Structs and member functions
+----------------------------
+in C, structs possess no member function unlike in C++.
+
+Bjarne Stroustrup, after many considerations, include it.
+A class type with no constructor is considered an aggregate, we want structs to remain aggregates.
+
+Class types with no data members
+--------------------------------
+its possible.
+
+
+= Const class objects and const member functions =
+==================================================
+
+class objects can be made `const`: they must be initialized uoon creation and its members cannot br modified after creation
+this includes:
+1) modifying member variables or
+2) calling member functions to somehow set the values of member variables.
+
+{{{cpp
+struct Date
+{
+  int year {};
+  int month {};
+  int day {};
+
+  void incrementDay() { ++day; }
+};
+
+int main()
+{
+  const Date yesterday { 2023, 12, 13 };
+  yesterday.incrementDay();                   // compile error: tries to modify member variable `day`.
+  yesterday.day++;                            // same: compile error: tries to modify member variable `day`.
+
+  // continue your shitty code here.
+}
+}}}
+
+Const objects may not call non-const member functions
+-----------------------------------------------------
+the compiler dosnt allow const objects call non-cont memeber functions.
+{{{cpp
+struct Date
+{
+  int year {};
+  int month {};
+  int day {};
+
+  void print() { std::cout << year << '/' << month << '/' << day; }
+};
+
+int main()
+{
+  const Date today { 2023, 12, 14 };
+  today.print();                        // you can't call non-const memeber functions on a const objects. ven if it doesnt moduf any member function its still a violation.
+}
+}}}
+
+Const member functions
+----------------------
+meber function can be made const by appending the `const` keyword after the membeer functions parameter list but before the functions body declaration:
+{{{cpp
+struct Date
+{
+  int year {};
+  int month {};
+  int day {};
+
+  void print() const                 // declared: therefore this is a const member function.
+  {
+    std::cout << year << '/' << month << '/' << day;
+  }
+};
+
+// now print can be called on a const object spawned from the classes typed struct: Foo
+int main()
+{
+  const Date oneDay { 1193, 11, 3 };
+  oneDay.print();                    // valid.
+}
+}}}
+
+A const member function that attempts to change a member variable or call a non-const member function will cause a compiler error to occur. For example:
+{{{cpp
+struct Date
+{
+  int day;
+  //...
+
+  void incrementDay() const
+  {
+    day++;                  // a const function is not allowed to modify a member function: compile error.
+  }
+};
+}}}
+
+Const member functions may be called on non-const objects
+---------------------------------------------------------
+const member functions can be called on non-const objects (and obvioulsy on const objects) and because of this member functions should usually be declared `const`:
+as long as they are not declared or used to modify any member variable, they should be `const`.
+
+Const objects via pass by const reference
+-----------------------------------------
+the problem with this if we pass a non-const objects into a function, lets call the function `x` , that was declared to take a const object in as a paramter
+( `void x (const Date& date)` ), the object will be coerced to be referenced as a const object and the object referenced conatains a non-const memeber function.
+
+Now, if we call the non-const member function on the referenced (coerced to be const) object (due to the functions parameter declaration), in function `x` we will
+encounter a compiler error because cons class objects are not allowed to call thier non-const member functions (its illegal).
+
+and this is the problem that may be enocuntered on passing objects via pass by const reference to a function.
+this can be prevented though by declaring member functions of a class type, with no intention to modify its member variables, as const.
+that way no error is encountered when such member functions is called: regardless of whether the object being called on is of const qualifier or not.
+
+Member function const and non-const overloading
+-----------------------------------------------
+its possibe to overload member function based on constness. this works because the `const` qualifier is considered part of a functions signature.
+
+
+= Public and private members and access specifiers =
+====================================================
+
+there are three access specifiers in c++ they are:
+1) public
+2) protetcted
+3) private
+
+The members of a struct are public by default
+---------------------------------------------
+structs by default has its members in public: can be accessd by anyone.
+Public can be accessed by other members of the same class and by the `public` (that is code that exist outside the members of a class type.)
+
+The members of a class are private by default
+---------------------------------------------
+Private members are members that can only accessed by other members of the same class.
+and by default members in a class are private.
+{{{cpp
+#include <iostream>
+
+class Date
+{
+  int m_year {};              // pirvate by default
+  int m_month {};             // private by default
+  int m_day {};               // private by default
+
+  void print() const          // private by default
+  {
+    // member functions can access private members
+    std::cout << m_year << '/' << m_month << '/' << m_day;
+  }
+};
+
+int main()
+{
+  Date today { 2023, 12, 14 };
+
+  today.m_day = 16;                 // illegal cannot be accessd by the public
+  today.print();                    // illegal cannot be accessed by the piblic
+}
+}}}
+
+Naming your private member variables
+------------------------------------
+its a common convention to name private data members starting with an `m_` prefix
+
+Setting access levels via access specifiers
+-------------------------------------------
+by default members of structs and unions are `public` by default and the members of classes are `private` by default.
+howwever we can explicitly set the access levels of our members using an `access specifier`:
+1) `public:`
+2) `private:`
+3) `protected:`
+
+an example:
+{{{cpp
+class Date
+{
+public:
+  void print() const
+  {
+    std::cout << m_year << '/' << m_month << '/' << m_day;
+  }
+private:
+  int m_year { 2023 };
+  int m_month { 12 };
+  int m_day { 30 };
+};
+
+int main()
+{
+  Date d{};
+  d.print();                      // okay because this is a public function that was used to access private data.
+  return 0;
+}
+}}}
+
+private members can be accessed by the public through private functions.
+
+since classes mmebers default as private: you can declare them without the private specifier when you need them to be private:
+{{{cpp
+class Foo
+{
+  int m_something{};             // this is private by default.
+};
+}}}
+
+Access level best practices for structs and classes
+---------------------------------------------------
+structs should avoid acccess level specifiers, this is because we want structs to remain as aggregates and aggaregates only posess public members,
+and structs members are publicly accessible by default, so theres no need to use specifiers let alone a private specifier which destroys the logic of
+structs being aggregates
+
+classes should generally only have private or protected data members, either by specifying (using `private:` or `protected:`) or the default private access level.
+
+Access levels work on a per-class basis
+---------------------------------------
+onw of the nuance of c++ access levels that is often misunderstood is that access of members is defined per class basis and not per object basis:
+what this means is that member functions are not just limited to `thier` accessing private members but they can also access the privtate members of `ANY` other objects of
+thier class type that is in scope.
+
+{{{cpp
+#include <iostream>
+#include <string>
+#include <string_view>
+
+class Person
+{
+private:
+  std::string_view m_name {};
+
+public:
+  void kisses(const Person& p) const
+  {
+    std::cout << m_name << " kisses " << p.m_name << '\n';
+  }
+  void setName(std::string_view name)
+  {
+    m_name = name
+  }
+};
+
+int main()
+{
+  Person joe;
+  joe.setName("Joe");
+
+  Person kate;
+  kate.setName("Kate");
+
+  joe.kisees(kate);       // ths compiles successfuclly and executes accurately: this tells us that public methods can access the private members of even other objects
+  // of the same type.
+}
+}}}
+
+becaues our class has private members: its not an aggregate meaning it cannot be initialized using aggregate initializations, as a workaround we provide a public
+function that can used to access private members.
+
+public member functions have the access to private member functions anf also the private member functions of other objects of the same type as long as they are in scope.
+
+The technical and practical difference between structs and classes
+------------------------------------------------------------------
+structs defaules its members to be `public` while classes default its members as `private`. thats the only difference (i think)
+
+we use structs when the following are true:
+1) we hava a simple collecstion of data that does no benefit from being inaccessible by the public
+2) aggregate initialization is sufficient
+3) there are no class invariants, setup needs or cleanup needs
+
+if any the above are not true, you should likely use a class
+we want out structs to be aggregates, so if any capablity that is non-aggregate in nature is required: one should opt for classes instead of structs.
+
+
+`Access functions`
+================
+an `access` function is a trivial member function of a class whose job is to retreive or change the value of a private member.
+they come in 2 flavors:
+1) getters
+2) setters
+
+getters sometimes called `accessors` and setters which are sometimes called `mutators`.
+
+Getters :: public member functions that return the value of private memvber variables.
+Setters :: public member functions that set the value of a private member variable.
+
+Getters are usually made const so they can be called on both const and non-const objects
+Setters should be non const so they can modify the data members.
+
+for illustative purposes the Date class updated:
+{{{cpp
+#include <iostream>
+
+class Date
+{
+private:
+  int m_year { 2020 };
+  int m_month { 12 };
+  int m_day { 23 };
+
+public:
+  int getYear() const { return m_year };        // getter for year
+  int setYear(int year) { m_year = year };      // setter for month
+
+  int getMonth() const { return m_month };      // getter for month
+  int setMonth(int month) { m_month = month };  // setter for month
+
+  int getDay() const { return m_day };          // getter for year
+  int setDay(int day) { m_day = day };          // setter for month
+};
+
+int main()
+{
+  Date d{};
+  d.setYear(2024);
+  std::cout << "The year is: " << d.getYear() << '\n';
+}
+}}}
+
+Access function naming
+----------------------
+1) use the `get` or `set` prefixes for the identifers of the getters and setters respectively
+2) or only use the `set` prefix for a setter and the normal identifier with no prefix for the `getter`
+
+Getters should return by value or by const lvalue reference
+-----------------------------------------------------------
+getters should only provide `read-only`access to data. meaning they should only return by value or const lvalue refernce.
+
+Only provide access functions in cases where the public would reasonably need to get or set the value of an individual member.
+
+Why make data private if we’re going to provide a public access functions to it?
+--------------------------------------------------------------------------------
+this well be answered in future notes (i hope)
+
 
