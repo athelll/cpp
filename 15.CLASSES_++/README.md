@@ -4,8 +4,6 @@ More on Classes
 
 The hidden “this” pointer and member function chaining
 ======================================================
-this topic focuses on the implicit this pointer and how function chaining can be achieved.
-
 The hidden this pointer
 -----------------------
 inside every member function, the keyword is a const pointer that holds the address of the current implicit object.
