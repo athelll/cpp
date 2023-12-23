@@ -2,7 +2,7 @@ Felix Ikechukwu O. Dec 23, 2023
 More on Classes
 
 
-## The hidden “this” pointer and member function chaining
+# The hidden “this” pointer and member function chaining
 
 ### The hidden this pointer
 ---------------------------
@@ -39,7 +39,7 @@ note:
 ```
 
 ### How is this set?
-
+--------------------
 lets examine the function call:
 ```cpp
 simple.setId(2);
@@ -57,11 +57,11 @@ the good news of this is that this process happens automatically by the compiler
 all `non-static` member functions have a `this` const pointer that points to its implicit object.
 
 ### `this` always points to the object being operated on
-
+------------------------------------------------------
 yup and becasue this is a member function parameter not a mameber, it has no large impact on your object memory-wise.
 
 ### Explicitly referencing this
-
+-------------------------------
 sometimes developers use the `this->` syntax to disambigaute referencing member variables that share the same identifier with some other non-member variable.
 {{{cpp
 struct Something
@@ -75,7 +75,7 @@ struct Something
 }}}
 
 ### Returning `*this`
-
+-------------------
 sometimes it can be helpful to have member function return the `this` pointer (address of the implicit object): this allows mwmber function to be "chained" together,
 so several member functions can be called on the same object in single expression.
 
@@ -117,7 +117,7 @@ int main()
 ```
 
 ### Resetting a class back to default state
-
+-------------------------------------------
 this is done bu assigning the `this` pointer of an object to an empty list initiizer. this forces the this pointer to point ti newly created empty defaultly initiazlized or non-initialized object:
 ```cpp
 void reset()
@@ -127,7 +127,7 @@ void reset()
 ```
 
 
-## Classes and header files
+# Classes and header files
 
 due to how exponentially large classes declaration and implementaions can get: it can get quite compliciated managing classes. to fix this issue
 C++ allows us to seperate the `declaration` and `implementation` of classes by defining member functions outside of the class definitaion and placing the prototype designs in the class:
@@ -173,21 +173,20 @@ things to note:
 2. member functions with complex or multi-line implementaion should be defiend out the class preferrably in a seperate source file
 
 ### Putting class definitions in a header file
-
+----------------------------------------------
 read here
 
 ### Doesn’t defining a class in a header file violate the one-definition rule if the header is #included more than once?
-
+------------------------------------------------------------------------------------------------------------------------
 no it doesnt it: Types are expempted from the ODR(ule). just use header guards.
 functiond defiend inside a class declaration are implicitly inline which allows them tonbe included in multiple files without violating the ODR.
 
 functions defined outside a class declaration are not implicitly inline. they can be made inline using the `inline` keyword.
 
 ### Libraries
-
+-------------
 read this again
 
 
-## Nested types (member types)
-
+# Nested types (member types)
 
