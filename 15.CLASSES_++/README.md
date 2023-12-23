@@ -63,7 +63,7 @@ yup and becasue this is a member function parameter not a mameber, it has no lar
 Explicitly referencing this
 ---------------------------
 sometimes developers use the `this->` syntax to disambigaute referencing member variables that share the same identifier with some other non-member variable.
-{{{cpp
+```cpp
 struct Something
 {
   int data {};
@@ -72,7 +72,7 @@ struct Something
     this ->data = data;             // fixes disambiguity.
   }
 };
-}}}
+```
 
 Returning `*this`
 ---------------
