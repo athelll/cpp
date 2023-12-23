@@ -1223,3 +1223,167 @@ Unnecessary copies
 when we make needless ineffecient declarations in our coude the compiler is free to reformat them to make them more efficient
 this is what is done by the compiler when we make needless copies using the copy constructor: this is known as `copy elision`
 
+Copy Elision
+------------
+this is a compiler  optimization that allows the compiler optimize object copying: by removing uneccessary copying.
+meaning in cases where the compiler might call the copy constructors the compiler ultimately re-writes the the code to prevent the copy constructor
+being called again. when the constructor optimizes a way not to call the copy constructor we say the constructor has been `elided`.
+
+unlike other types of optimizations: the copy elision is exempted from the `as if` rule: meaning that copy elision is allow to `elide` a cpy constructors, even if
+it has side effects. and this is why copy constrictors should not have other action aside copying this is because of `copy elision`.
+
+Copy elision in pass by value and return by value
+-------------------------------------------------
+
+the copy constrictors is mostly called when an argument is passed into a paramter of the same type or a returned object is returned to an object variable of the
+same type: but in most cases the copy constructors are eluded.
+
+its not important to know when a compiler eludes a copy constrictor whats important is known that your compiler will if it.
+if you expect to see your copy constructor called but its wasnt `copy elision`  is probably why.
+
+Copy elision errata
+-------------------
+proir c++17 copy elision was a strictly optional optimization compilers could make, but come c++17, it became mandatory in some cases.
+
+
+`Converting constructors and the explicit keyword`
+================================================
+by default all constructors are converting constructor.
+
+Only one user-defined conversion may be applied
+-----------------------------------------------
+in the code below: we mitght expect the conversion to be legal anc work but it doesnt: `onty one user-defined conversion may be applied`:
+{{{cpp
+#include <iostream>
+#include <string>
+#include <string_view>
+
+class Employee
+{
+private:
+  std::string m_name {};
+
+public:
+  Employee(std::string_view name)       // constructor: also converting constructor
+  : m_name { name }
+  {
+  }
+
+  const std::string& getName() const { return m_name; }
+};
+
+void printEmployee(Employee e)
+{
+  std::cout << e.getName() << '\n';
+}
+
+int main()
+{
+  printEmployee("Joe");                 // passes in a C-styled string which is passed into the Employee argument of the function.
+}
+}}}
+
+here the compiler throws a compiler error: conversion constructors only allow one user-defined conversion.
+exactly and precisely, only one. two or more a compiler error is thrown like the code above.
+lest break the process in the above snippet:
+1) firstly, a c-styles string is passes into the `Employee e` paramter of the function to be called
+2) the constructor and its paramters of the employee class tries to perform a conversion
+3) the c-styles strring is converted to an `std::string_view` object first: as demended fo teh constructors parameter ( that 1 conversion count)
+4) then the resulted `std::string_view` is now used to convert into an `Employee object`: ( thats 2 consvesions count )
+5) then a compiler error is thrown because not more than one conversion is allowed by converting conversions.
+
+there are 2 ways of making this work:
+1) passing in the arguemnt as the preferref type prevent double conversion:
+{{{cpp
+int main()
+{
+  using namespace std::literals;
+  printEmployee("John"sv);                      // this is now a  string_view literal: no need for double conversion.
+  return 0;
+}
+}}}
+
+1) making an anonymous object and passing that as an arguemnt: now there no need for conversion just member-copying:
+{{{cpp
+int main()
+{
+  printEmployee( Employee{ "Joe" } );         // passing in an anonymous object with the data we want initialized into it.
+  return 0;
+}
+}}}
+
+When converting constructors go wrong
+-------------------------------------
+the `explicit` keyword tells the compiler not to use the constructor as a converting constructor.
+
+making a constructor `explicit` has 2 notable consequences:
+1) an explicit constructor cannot be used to do copy initialization or copy list initialization. (can do `Obj x = 4;` copy inits with `=`operator)
+2) they cannot be used to do implicit conversions.
+
+when the `explicit` kwyword is used its tells te compiler not to allow implicit conversions when using constructors only explicitly constructed values.
+an example:
+{{{cpp
+#include <iostream>
+
+class Dollar
+{
+private:
+  int m_value {};
+
+public:
+  explicit Dollar(int value)
+  : m_value { value }
+  {}
+
+  int getDollar const { return m_value; }
+};
+
+void print(Dollars d)
+{
+    std::cout << "$" << d.getDollars();
+}
+
+int main()
+{
+  print(5);                       // illegal: no implicit conversions allowed.
+}
+}}}
+
+Explicit constructors can be used for direct and list initialization
+--------------------------------------------------------------------
+{{{cpp
+Dollar one (1);                   // allowed: direct initialization is allowed.
+Dollar two {2};                   // allowed: direct list initialization is allowed.
+Dollar three = 3;                 // illegal: copy initialization is not allowed.
+}}}
+
+Return by value and explicit constructors
+-----------------------------------------
+with explicit constructors returned object that can be impicitly converted to match the return type of a function is also not allowed.
+same principle as passing unmatching typed object an argument to functions parameter.
+{{{cpp
+
+class Foo
+{
+public:
+  explicit Foo()
+  {}
+
+  explicit Foo(int x)
+  {}
+};
+
+Foo getFoo()
+{
+  return Foo{};               // legal : no implicit conversion needed here
+  return 5;                   // illegal: implicit conversion needed.
+  return Foo{5};              // legal: no implicit conversion needed
+  return { 5 };               // illegal: implicit conversion needed.
+  return {};                  // illegal: implicit conversion needed.
+}
+}}}
+
+
+Best practices for use of explicit
+----------------------------------
+make constructors that accept single values explicit by default. for the rest uses cases read the shit on the site
