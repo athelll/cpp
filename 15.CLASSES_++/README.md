@@ -37,7 +37,7 @@ note:
   void print() { std::cout << m_id; };                          // implicit use of this
   void print() { std::cout << this->m_id; };                    // explicit use of this.
 ```
-<br>
+
 How is this set?
 ----------------
 lets examine the function call:
@@ -55,7 +55,6 @@ void setID(Simple* const this, int id) { this->m_id = id; }
 
 the good news of this is that this process happens automatically by the compiler so we dont need to explicitely state this.
 all `non-static` member functions have a `this` const pointer that points to its implicit object.
-<br>
 
 `this` always points to the object being operated on
 --------------------------------------------------
@@ -74,7 +73,6 @@ struct Something
   }
 };
 ```
-<br>
 
 Returning `*this`
 ---------------
@@ -117,7 +115,6 @@ int main()
   std::cout << new << '\n';
 }
 ```
-<br>
 
 Resetting a class back to default state
 ---------------------------------------
@@ -175,12 +172,10 @@ int main()
 things to note:
 1. member functions with trivial implementation, can be defined inside a class
 2. member functions with complex or multi-line implementaion should be defiend out the class preferrably in a seperate source file
-<br>
 
 Putting class definitions in a header file
 ------------------------------------------
 read here
-<br>
 
 Doesn’t defining a class in a header file violate the one-definition rule if the header is #included more than once?
 --------------------------------------------------------------------------------------------------------------------
@@ -188,12 +183,10 @@ no it doesnt it: Types are expempted from the ODR(ule). just use header guards.
 functiond defiend inside a class declaration are implicitly inline which allows them tonbe included in multiple files without violating the ODR.
 
 functions defined outside a class declaration are not implicitly inline. they can be made inline using the `inline` keyword.
-<br>
 
 Libraries
 ---------
 read this again
-<br>
 
 ----------------------------------------------------
 
