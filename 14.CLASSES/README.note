@@ -508,14 +508,14 @@ private:
   int m_day { 23 };
 
 public:
-  int getYear() const { return m_year };        // getter for year
-  int setYear(int year) { m_year = year };      // setter for month
+  int getYear() const { return m_year; }        // getter for year
+  int setYear(int year) { m_year = year; }      // setter for month
 
-  int getMonth() const { return m_month };      // getter for month
-  int setMonth(int month) { m_month = month };  // setter for month
+  int getMonth() const { return m_month; }      // getter for month
+  int setMonth(int month) { m_month = month; }  // setter for month
 
-  int getDay() const { return m_day };          // getter for year
-  int setDay(int day) { m_day = day };          // setter for month
+  int getDay() const { return m_day; }          // getter for year
+  int setDay(int day) { m_day = day; }          // setter for month
 };
 
 int main()
@@ -541,4 +541,685 @@ Why make data private if we’re going to provide a public access functions to i
 --------------------------------------------------------------------------------
 this well be answered in future notes (i hope)
 
+
+`Member functions returning references to data members`
+=====================================================
+
+Introduction
+------------
+its safe for memmber functions to return members with const lvalue reference: this is because sine that members of an object posses the same lifetime as their implicit object that they are called retrieved
+or accessed from then its quite (likely) immpossible for one to return a dangling reference of a memeber from its object.
+
+and the reason we use retunr by const lvalue reference is because (sometimes) copt return can be quite expensive especially if the size of the data to be return is large.
+{{{cpp
+#include <iostream>
+#include <string>
+
+class Employee
+{
+private:
+  std::string m_name {};
+
+public:
+  void setName(string_view name) { m_name = name; }
+  const std::string& getName() const { return m_name; }       // getter returns by const reference.
+};
+
+int main()
+{
+  Employee Joe {};
+  joe.setName("Joe");
+  std::cout << joe.getName << '\n';
+}
+}}}
+
+The return type of a member function returning a reference to a data member should match the data member’s type
+---------------------------------------------------------------------------------------------------------------
+for getter using `auto` is a convennient way to allow th compiler deduce the type of the data to be returned and prevent implicit conversions
+{{{cpp
+class Employee
+{
+private:
+  std::string name{};
+
+public:
+  const auto& getaName() const { return name; }       // now he compiler makes sure this function returns a reference to the deduced type of the data to be returned.
+  // ---
+};
+  // ---
+}}}
+
+however returning with the `auto` keywords  kind of obscures the type of string type that is returned: is it `C-style strings?`, `string_views?`, `strings?` or somehing else entierely?
+this is why we mostly explicitly state the type of sntring we want to be returned.
+
+Rvalue implicit objects and return by reference
+-----------------------------------------------
+recalll that rvalues are destroyed at the end of the expressions they are declared in so returning rvalue implicit objects into a referenced can prove to be problematic
+bcacuse well be handling a dangling reference: this is because the object being an rvalue will be destroyed at the end of the ecpression which includes its members too (theyll be destroyed also)
+so accessing them through a reference will be result to UB becauee after that expression the implicit object and its objects no longer exists (they have been destroyed).
+
+an example exploring this concept
+{{{cpp
+#include <ioatream>
+#include <string>
+#include <string_view>
+
+class Employee
+{
+private:
+  std::string m_name{};
+
+public:
+  void setName(std::string_view name) { m_name = name; }
+  const std::string& getName() const { return name; }
+};
+
+Employee createEmployee( std::string_view name )
+{
+  Employee e;
+  e.setName( name );
+  return e;
+}
+
+int main()
+{
+  // case 1: using the returned rvalue before the statement ends: OK. its legal
+  std::cout << createEmployee("Zuriel").getName() << '\n';
+
+  // case 2: trying to save a returned rvalue into a reference for later use with the mindset that it'll still be a reference to a valid object: NOT OK. its illegal
+  // : implicit rvalue objects die at the end of the expression its used in.
+  const std::string& ref { createEmployee("Naomi").getName() };
+  std::cout << ref ;      // undefined behaviour.
+
+  // case 3: storing the retunrned rvalue into a normal vairable of the same type (not a reference): OK. its legal: this is because the rvalue is passed by copy and after being copied its destroyed.
+  const std::string name { createEmployee("Hedwig").getName() };
+  std::cout << name << '\n';  // still legal.
+}
+
+}}}
+
+Using member functions that return by reference safely
+------------------------------------------------------
+blah blah blah...
+
+Do not return non-const references to private data members
+----------------------------------------------------------
+this is quite obvious why: with non-const reference we can edit the the value of an object includeing private members which defeats the point of setters and the member being private itself
+and even the non-aggregate nature classes are supposed to be distinguished by.
+
+Const member functions can’t return non-const references to data members
+------------------------------------------------------------------------
+A const member function is not alowed to return non-const member functions to members. this makes sense  a const member function is not allowed to modify the state of am object.
+
+
+
+`The benefits of data hiding (encapsulation)`
+===========================================
+read this shit yourself.
+
+Prefer non-member functions to member functions
+-----------------------------------------------
+if a function can be implelemeted as a non-member function: prefer this than actually implemeting member functions.
+for the reason consult the site bish.
+
+
+`Introduction to constructors`
+============================
+
+when a class tyoe is an aggregate we use can use agreggate intialization to initialize them directly like on structs.
+Aggregate initialization do member wise initialization and initialize its members in the order they are declared.
+Hoever when we make our members private we can no longer use aggregate initialization be cause aggregates cant have private members like in the class-type `class`.
+
+if we try to use the aggregate initialization to initialize aggregates we get the compiler error:
+`“error: no matching constructor for initialization of ‘Foo'”`
+
+meaning we need a constructor, but what are they?
+
+Constructors
+------------
+a constructor is a function that is called immediately called after a non-aggregate class type object is created.
+
+we use constructors to initialzae member variables ot perform some initialization action. constructors do not create objects: the compiler allocates memory for the objects
+prior to calling the constructror: once a  constructor is done executed we can say that the object is now `constructed`.
+
+Naming constructors
+-------------------
+unlike normal member functrions constructors have specifiec rule or how they should be declared and named:
+1) they must have the same name or identifier as the class they belong to
+2) they are not to have any return type not even void
+
+basic constructors example:
+{{{cpp
+class Point
+{
+private:
+  int m_x{};
+  int m_y{};
+public:
+  Point(int x, int y)
+  {
+    m_x = x;
+    m_y = y;
+  }
+
+  void print()
+  {
+    std::cout << m_x << ':' << m_y << '\n';
+  }
+};
+
+int main()
+{
+  Point point { 10, 56 };
+  point.print();
+}
+}}}
+
+constructors should not be `const`: this is because it needs to modify member variables which cannot be achieved if `const`
+
+
+`Constructor member initializer lists`
+====================================
+to allow constructors initialize member variable we can use the `member initialization list`.
+{{{cpp
+#include <iostream>
+
+class Foo
+{
+private:
+  int m_x {};
+  int m_y {};
+public:
+  Foo(int x, int y)
+    : m_x { x } , m_y { y }
+  {
+    std::cout << "Foo(" << x << ", " << y << ") constructed\n";
+  }
+
+  void print() const
+  {
+    std::cout << "Foo(" << m_x << ", " << m_y << ")\n";
+  }
+};
+
+int main()
+{
+  Foo foo { 6, 7 };
+  foo.print();
+}
+}}}
+
+Member initialization order
+---------------------------
+the c++ standard says the members should be initialized in the order they are declared: meaning defining costructer member initilizeer lists to initialize in the wrong order can be problematic:
+case example:
+{{{cpp
+#include <iostream>
+#include <algorithm>
+
+class Foo
+{
+private:
+  int m_one {};
+  int m_two {};
+public:
+  Foo(int x, int y) : m_y { std::max(x, y) }, m_x { m_y }
+  {
+  }
+
+  void print() const
+  {
+    std::cout << "Foo(" << m_x << ", " << m_y << ")\n";
+  }
+};
+
+int main()
+{
+  Foo foo { 5, 6 };
+  foo.print();
+}
+}}}
+
+on my mcahine it prints:
+`Foo(0, 6)`
+
+which isnt supposed to be, but this happrns because:
+* the compiler tries to initialize m_one first: this is becaue it was declared first
+* since it was declared to initialize m_one with m_two it proceed to do and because m_two hasent being initialized yet
+  by its constructor it refers back to its zero initialization when it was first declared and returns 0.
+* therby initializing m_one with zero
+* Now its time for m_two to be initialized it finds the max of 5 and 6 and uses the result to initialize itself
+* thus making m_two possess the value 6.
+
+to prevent thus member variables in a member list constructor initilizer should be initialized in the order they are declared.
+
+Member initializer list vs default member initializers
+------------------------------------------------------
+Members can be initialized in a few different ways:
+
+1)    If a member is listed in the member initializer list, that initialization value is used
+2)    Otherwise, if the member has a default member initializer, that initialization value is used
+3)    Otherwise, the member is default initialized
+
+Constructor function bodies
+---------------------------
+Prefer using the member initializer list to initialize your members over assigning values in the body of the constructor.
+{{{cpp
+#include <iostream>
+#define NOT_INIT
+
+class Foo
+{
+private:
+  int m_x{};
+  int m_y{};
+public:
+#ifdef NOT_INIT
+  Foo(int x, int y)
+  {
+    m_x = x;                // this is not initialization, this is an assignment: wont always work
+    m_y = y;                // this is not initialization, this is an assignment: wont always work
+  }
+#else
+  Foo(int x, int y)
+    : m_x { x }, m_y { y }  // this is initialization (constructor list initialization)
+  {
+    // body of constrictor can be left empty if it was intended ton be used for member initialized only.
+  }
+#endif
+
+  void print() const
+  {
+    std::cout << "Foo(" << m_x << ", " << m_y << ")\n";
+  }
+};
+
+int main() { }
+}}}
+
+
+`Default constructors and default arguments`
+==========================================
+
+a default constructor is a constructor that accpets no argument. typically its a constructor that has been defined with no paramters.
+{{{cpp
+class Foo
+{
+public:
+  Foo()       // thus is a default constructor
+  [
+    std::cout << "Foo is a default constructer";
+  ]
+}
+}}}
+
+Value initialization vs default initialization for class types
+--------------------------------------------------------------
+we should prefere value initialization to default initialization because safer for aggregates and since its difficult to tell by glance if a class tyoe is an aggregate or not
+its safer to use `value initialization`.
+{{{cpp
+Foo foo{};      // value init.tion    : still calls constructor
+Foo foo2;       // default init.tion  : still calls constructor
+}}}
+
+Constructors with default arguments
+-----------------------------------
+just as normal function: constructors can have default arguments:
+{{{cpp
+class Foo
+{
+private:
+  int m_x {};
+  int m_y {};
+public:
+  Foo(int x=0, int y=0) : m_x { x },  m_y { y }
+  {
+  }
+};
+}}}
+
+if all the paramters of a constructor has default arguments then the constructor is a default constructor becaule it can be called with no arguments
+
+Overloaded constructors
+-----------------------
+constructors can be overloaded:
+{{{cpp
+class Foo
+{
+private:
+  int m_x {};
+  int m_y {};
+public:
+  Foo()
+  {
+    std::cout << "this shit has been constructed bitch" << '\n';
+  }
+
+  Foo(int x, int y) : m_x { x }, m_y { y }
+  {
+    std::cout << "Foo(" << x << ", " << y << ") constructed\n";
+  }
+};
+}}}
+
+despite we can do this classes should only have one conctructor:
+    this is becasue if the compiler encounters an ambigous constructor call and doesnt know which
+    constructor to call in the event that mutiple constructors exists that can handle the same call: a compiler error is thrown
+
+An implicit default constructor
+-------------------------------
+if a non-aggregate class tyoe is declared without a constructor the compiler gemerates one for it. this generated constructor is known as an:
+`implicit default constructor`.
+
+Using `= default` to generate a default constructor
+-------------------------------------------------
+in cases were would write a default constructor that is similar to the imeplicitly generated default contructor we can tell the compiler to generate
+an implicit default constructor for use by using the following syntax:
+{{{cpp
+class Foo
+{
+private:
+  int m_x {};
+  int m_y {};
+
+public:
+  Foo() = default;
+
+  Foo(int x, int y)
+    : m_x { x }, m_y { y }
+  {
+    std::cout << "Foo(" << x << ", " << y << ") constructed\n";
+  }
+};
+
+int main()
+{
+  Foo foo {};   // calls Foo() default constructor.
+  return 0;
+}
+
+}}}
+
+Implicit default constructor vs empty user constructor
+------------------------------------------------------
+Prefer an explicitly defaulted default constructor (=default) over a default constructor with an empty body.
+
+
+`Delegating constructors`
+=======================
+constructors are allowed to call other functions including member functions
+constructors are not designed to be called from the body of another function (including other constructors)
+
+but contructors are akllowed to transfer redponsibility of initialization to another constructor of the same class type, this is known as constructor chaining
+and such constructors are known as deleagting constructors.
+
+an example of constructor delegating:
+{{{cpp
+#include <iostream>
+#include <string>
+#include <string_view>
+
+class Employee
+{
+private:
+  std::string m_name {};
+  int m_id { 0 };
+public:
+  Employee(std:string_view name)
+    : Employee{ name, 0 }                               // delegates initilialization to Emplpoyee(std::string_view, int) constructor
+  {
+  }
+
+  Employee(std::string_view name, int id)
+    : m_name { name }, m_id { id }                      // actually initializes the members
+  {
+    std::cout << "Employee " << m_name << " created\n";
+  }
+};
+}}}
+
+a few notes on deleagting constructors:
+1) they are not alowwed to initialize members themeselves: so your constructors can either initialize or deleagte but not both.
+2) also constructors can delegate to another comstructor that delegates back to its delegator: causing an inifinite loop of deleagation thereby making your stack run out of memory
+   crrashing your program
+
+Reducing constructors using default arguments
+---------------------------------------------
+Default values help to reduce multiple constructors into few constructors. for example by using default values we can initialize objects with fewer arguments because the
+unspecified defaulted arguments can fall back to the default values laid out for thier constructor and be constructed with no issue.
+
+A conundrum: Redundant constructors vs redundant default values
+---------------------------------------------------------------
+read this conundrum yourself.
+
+
+`Temporary class objects`
+=======================
+
+this are anonymous rvalue objects with no name that posses a lifetime equal to the duration of the exoression they are declared in.
+they are also known as `temporary objects`, `anonymous objects` or `unamed objects`.
+
+wasys of creating anonymous objeects:
+{{{cpp
+
+class IntPair
+{
+private:
+  int m_x {};
+  int m_y {};
+publci:
+  IntPair(int x, int y) : m_x { x }, m_y { y }
+  { }
+
+  int x() const { return  m_x };
+  int y() const { return  m_y };
+};
+
+void print(IntPair& x)
+{
+  std::cout << "(" << p.x() << ", " << p.y() << ")\n";
+}
+
+int main()
+{
+  // case 1: not a temporary object
+  IntPair p { 2, 3 };
+  print( p );
+
+  // case 2: a temporary object no name
+  print( IntPair { 4, 5 } );
+
+  // case 3: also a temporary object no type or name since its values are still gog to be stored in the functions parameter which is of type IntPair
+  print( { 6, 7 } );
+
+  return 0;
+}
+}}}
+
+we can also use temporary objects in functions return:
+{{{cpp
+#include <iostream>
+
+class IntPair
+{
+  // previous IntPair class declaration here
+};
+
+void print(IntPair p)
+{
+  std::cout << "(" << p.x() << ", " << p.y() << ")\n";
+}
+
+// case 1: not an anonymous return
+IntPair ret1()
+{
+  IntPair p { 1, 2 };
+  return p
+}
+
+// case 2: an anonymous object return : no name
+IntPair ret2()
+{
+  return IntPair { 3, 4 };
+}
+
+// case 3: an anonymous object return: no name, no explicitly declared type. allows the compiler implicitlty convert the values into the return type of the function
+IntPair ret3()
+{
+  return { 5, 6 };
+}
+
+int main()
+{
+  print( ret1() );
+  print( ret2() );
+  print( ret3() );
+
+  return 0;
+}
+}}}
+
+A few notes
+-----------
+1) a temporaty object is an rvalue and its can only be used where rvalues can be used.
+2) temporary objects are created at the point of defination and are destoroyed at the end of a full expression not a sub-expression.
+
+
+`Introduction to the copy constructor`
+====================================
+
+Introduction
+------------
+a copy constructor is a constructor that is used to initialize an objects with the member of another object of the same class type, adter a copy constructors is executed
+the copy object should be a copy of the object passed in as an initializer.
+
+An implicit copy constructor
+----------------------------
+read this: it does memberwise initializaton construction and its implicit in nature so need to define yours
+
+Defining your own copy constructor
+----------------------------------
+it takes in a reference of an object of the same type and initializes its members with the members of the passed in object member_wisely.
+{{{cpp
+#include <iostream>
+
+class Fraction
+{
+private:
+  int m_n { 0 };
+  int m_d { 1 };
+private:
+  Fraction (int n=0, int d=1)
+    : m_n { n }
+    , m_d { d }
+  { }
+
+  Fraction(const Fraction& f)                                 // this is a copy constructor
+    : m_n { f.m_n }
+    , m_d { f.m_d }
+  { }
+
+  void print() const
+  {
+    std::cout << "Fraction(" << m_numerator << ", " << m_denominator << ")\n";
+  }
+};
+
+int main()
+{
+  Fraction f { 2, 3 };
+  Fraction fCopy { f };                 // Fraction (const Fraction&) is called: this is a copy constructor.
+  return 0;
+}
+}}}
+
+copy constructors should have no side effects more than copying. if your relying on the copy constructor for other actions than copying that behaviour might not occur.
+
+<!--NOTE: PREFER DEFAULT COPY CONSTRUCTORS TO THAT OF THOSE YOU DEFINE YOURSELF -->
+
+The copy constructor’s parameter must be a reference
+----------------------------------------------------
+mmmmhmm. a `const lvalue reference` to be precise.
+
+Pass by value (and return by value) and the copy constructor
+------------------------------------------------------------
+when an objects is passed by value the argumnet is copied into the paramter and when the argument an parameter are of the same class the copy constructor is invoked
+making a copy. similarly the same process applies when an object is returned back to its caller by value. all this processs have one thing in common: they all make copies.
+will be explained in details later.
+
+Pass by value (and return by value) and the copy constructor
+------------------------------------------------------------
+if a class had no cpy constructor its implicitly gemerated by the compiler we can explicitly requst the compiler create a default constructor for us using the `= default` syntax.
+
+{{{cpp
+#include <iostream>
+
+class Fraction
+{
+private:
+    int m_numerator{ 0 };
+    int m_denominator{ 1 };
+
+public:
+    // Default constructor
+    Fraction(int numerator=0, int denominator=1)
+        : m_numerator{numerator}, m_denominator{denominator}
+    {
+    }
+
+    // Explicitly request default copy constructor
+    Fraction(const Fraction& fraction) = default;
+
+    void print() const
+    {
+        std::cout << "Fraction(" << m_numerator << ", " << m_denominator << ")\n";
+    }
+};
+}}}
+
+Using = delete to prevent copies
+--------------------------------
+occassionaly we can run into scenarios where we dont wnt certain class objects to be copy-able we can prevent that using the `= delete` syntax.
+{{{cpp
+
+class Fraction
+{
+  // before implementions here: check above codes
+public:
+  Fraction (const Fraction& fraction) = delete;                         // makes it impossible for the copy constructor to be called.
+  // after implementions here: check above codes
+};
+
+int main()
+{
+  Fraction f { 1, 2 };
+  Fraction fCopy { f };                                                 // compiler error: copy constructor cant be called so copies cannot be made.
+}
+}}}
+
+For advanced readers (which i am not yet : o)
+---------------------------------------------
+`the rule three` of c++ states that if a class requires a `user-defined copy constructor`, `destructor` or `copy assignement operator`, then it probably requires all three.
+this was later expanded to the `rule of five`, which adds the `move constructor` and `move assignment operator` to the list.
+
+
+`Class initialization and copy elision`
+=====================================
+
+in modern c++ `copy`, `direct` and `list` initiaization generally do the same thing: they initialize an object.
+
+For all types of initialization:
+1) when initializeing a class type sets of constructors of the class are examined and the best matching is use to initialize the object.
+2) when initializaing a non-class type, implicit conversion rules are use to determimine whether an implicit conversion exitsts.
+
+There are three key differences between the initialization forms:
+-----------------------------------------------------------------
+1) List initialization dissalows narrowing conversions
+2) copy initialization only considers non-explicit constructors/ consversion functions.
+3) List initialization prioritizes matching list constructors over matching constructors.
+
+Unnecessary copies
+------------------
+when we make needless ineffecient declarations in our coude the compiler is free to reformat them to make them more efficient
+this is what is done by the compiler when we make needless copies using the copy constructor: this is known as `copy elision`
 
