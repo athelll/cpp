@@ -8,10 +8,14 @@ struct Employee
 };
 
 std::ostream& operator<<(std::ostream& out, const Employee& x)
-{ return out << "id:   " << x.id << '\n' << "age:  " << x.age << '\n' << "wage: " << x.wage << '\n'; }
+{
+	return out << "id:   " << x.id << '\n' << "age:  " << x.age << '\n' << "wage: " << x.wage << '\n';
+}
 
 void raise_employee(Employee& x)
-{ x.wage += 10'000.0; }
+{
+	x.wage += 10'000.0;
+}
 
 int main()
 {
