@@ -25,17 +25,17 @@ a class is a program defined compound datatype that can have many memeber variab
 because its a program defined type it must be declared before its used.
 
 classes are similare to structs just that we use the `class` keyword instead of `struct` in its declaration:
-{{{cpp
+```cpp
 class Employee
 {
   int m_id {};
   int m_age {};
   double m_wage {};
 };
-}}}
+```
 
 example of a class date type:
-{{{cpp
+```cpp
 #include <iostream>
 
 class Date
@@ -57,7 +57,7 @@ int main()
   print_date(today);
   return 0;
 }
-}}}
+```
 
 Most of the C++ standard library is classes
 -------------------------------------------
@@ -85,7 +85,7 @@ they are declared inside a class defination (as a reminder a defination is alsp 
 A member function example
 -------------------------
 structs in c++ can have member functions:
-{{{cpp
+```cpp
 #include <iostream>
 
 struct Date
@@ -109,7 +109,7 @@ int main()
   return 0;
 }
 
-}}}
+```
 
 Calling member functions (and the implicit object)
 --------------------------------------------------
@@ -127,7 +127,7 @@ in a member function any member identifier not prefixed with the member selectio
 
 Another member function example
 -------------------------------
-{{{cpp
+```cpp
 #include <iostream>
 #include <string>
 
@@ -151,7 +151,7 @@ int main()
 
   return 0;
 }
-}}}
+```
 
 Member variables and functions can be defined in any order
 ----------------------------------------------------------
@@ -162,19 +162,19 @@ this is because due to member function being part of a program defined type (cla
 a snapshot of all member variables and functions declared in the class type so as long as its declared the compiler will be aware. unlike non-member functions that might
 be declared in another trasnslation unit needing a forward declaration to make the compiler aware of it (although its externaly linked).
 
-{{{cpp
+```cpp
 struct Foo
 {
   int m_x { z() };          // okay to call z() here even tho its not declared: because it still would be
   int m_y { z() };          // same thing as above
   int z() { return 5 };     // declared.
 };
-}}}
+```
 
 Member functions can be overloaded
 ----------------------------------
 just like non-member functions member function can be overloaded.
-{{{cpp
+```cpp
 #include <iostream>
 #include <string>
 
@@ -206,7 +206,7 @@ int main()
   today.print("The date is: ");       // calls Date::print(std::string_view)
   std::cout << '\n';
 }
-}}}
+```
 
 Structs and member functions
 ----------------------------
@@ -228,7 +228,7 @@ this includes:
 1) modifying member variables or
 2) calling member functions to somehow set the values of member variables.
 
-{{{cpp
+```cpp
 struct Date
 {
   int year {};
@@ -246,12 +246,12 @@ int main()
 
   // continue your shitty code here.
 }
-}}}
+```
 
 Const objects may not call non-const member functions
 -----------------------------------------------------
 the compiler dosnt allow const objects call non-cont memeber functions.
-{{{cpp
+```cpp
 struct Date
 {
   int year {};
@@ -266,12 +266,12 @@ int main()
   const Date today { 2023, 12, 14 };
   today.print();                        // you can't call non-const memeber functions on a const objects. ven if it doesnt moduf any member function its still a violation.
 }
-}}}
+```
 
 Const member functions
 ----------------------
 meber function can be made const by appending the `const` keyword after the membeer functions parameter list but before the functions body declaration:
-{{{cpp
+```cpp
 struct Date
 {
   int year {};
@@ -290,10 +290,10 @@ int main()
   const Date oneDay { 1193, 11, 3 };
   oneDay.print();                    // valid.
 }
-}}}
+```
 
 A const member function that attempts to change a member variable or call a non-const member function will cause a compiler error to occur. For example:
-{{{cpp
+```cpp
 struct Date
 {
   int day;
@@ -304,7 +304,7 @@ struct Date
     day++;                  // a const function is not allowed to modify a member function: compile error.
   }
 };
-}}}
+```
 
 Const member functions may be called on non-const objects
 ---------------------------------------------------------
@@ -345,7 +345,7 @@ The members of a class are private by default
 ---------------------------------------------
 Private members are members that can only accessed by other members of the same class.
 and by default members in a class are private.
-{{{cpp
+```cpp
 #include <iostream>
 
 class Date
@@ -368,7 +368,7 @@ int main()
   today.m_day = 16;                 // illegal cannot be accessd by the public
   today.print();                    // illegal cannot be accessed by the piblic
 }
-}}}
+```
 
 Naming your private member variables
 ------------------------------------
@@ -383,7 +383,7 @@ howwever we can explicitly set the access levels of our members using an `access
 3) `protected:`
 
 an example:
-{{{cpp
+```cpp
 class Date
 {
 public:
@@ -403,17 +403,17 @@ int main()
   d.print();                      // okay because this is a public function that was used to access private data.
   return 0;
 }
-}}}
+```
 
 private members can be accessed by the public through private functions.
 
 since classes mmebers default as private: you can declare them without the private specifier when you need them to be private:
-{{{cpp
+```cpp
 class Foo
 {
   int m_something{};             // this is private by default.
 };
-}}}
+```
 
 Access level best practices for structs and classes
 ---------------------------------------------------
@@ -429,7 +429,7 @@ onw of the nuance of c++ access levels that is often misunderstood is that acces
 what this means is that member functions are not just limited to `thier` accessing private members but they can also access the privtate members of `ANY` other objects of
 thier class type that is in scope.
 
-{{{cpp
+```cpp
 #include <iostream>
 #include <string>
 #include <string_view>
@@ -461,7 +461,7 @@ int main()
   joe.kisees(kate);       // ths compiles successfuclly and executes accurately: this tells us that public methods can access the private members of even other objects
   // of the same type.
 }
-}}}
+```
 
 becaues our class has private members: its not an aggregate meaning it cannot be initialized using aggregate initializations, as a workaround we provide a public
 function that can used to access private members.
@@ -497,7 +497,7 @@ Getters are usually made const so they can be called on both const and non-const
 Setters should be non const so they can modify the data members.
 
 for illustative purposes the Date class updated:
-{{{cpp
+```cpp
 #include <iostream>
 
 class Date
@@ -524,7 +524,7 @@ int main()
   d.setYear(2024);
   std::cout << "The year is: " << d.getYear() << '\n';
 }
-}}}
+```
 
 Access function naming
 ----------------------
@@ -551,7 +551,7 @@ its safe for memmber functions to return members with const lvalue reference: th
 or accessed from then its quite (likely) immpossible for one to return a dangling reference of a memeber from its object.
 
 and the reason we use retunr by const lvalue reference is because (sometimes) copt return can be quite expensive especially if the size of the data to be return is large.
-{{{cpp
+```cpp
 #include <iostream>
 #include <string>
 
@@ -571,12 +571,12 @@ int main()
   joe.setName("Joe");
   std::cout << joe.getName << '\n';
 }
-}}}
+```
 
 The return type of a member function returning a reference to a data member should match the data member’s type
 ---------------------------------------------------------------------------------------------------------------
 for getter using `auto` is a convennient way to allow th compiler deduce the type of the data to be returned and prevent implicit conversions
-{{{cpp
+```cpp
 class Employee
 {
 private:
@@ -587,7 +587,7 @@ public:
   // ---
 };
   // ---
-}}}
+```
 
 however returning with the `auto` keywords  kind of obscures the type of string type that is returned: is it `C-style strings?`, `string_views?`, `strings?` or somehing else entierely?
 this is why we mostly explicitly state the type of sntring we want to be returned.
@@ -599,7 +599,7 @@ bcacuse well be handling a dangling reference: this is because the object being 
 so accessing them through a reference will be result to UB becauee after that expression the implicit object and its objects no longer exists (they have been destroyed).
 
 an example exploring this concept
-{{{cpp
+```cpp
 #include <ioatream>
 #include <string>
 #include <string_view>
@@ -636,7 +636,7 @@ int main()
   std::cout << name << '\n';  // still legal.
 }
 
-}}}
+```
 
 Using member functions that return by reference safely
 ------------------------------------------------------
@@ -689,7 +689,7 @@ unlike normal member functrions constructors have specifiec rule or how they sho
 2) they are not to have any return type not even void
 
 basic constructors example:
-{{{cpp
+```cpp
 class Point
 {
 private:
@@ -713,7 +713,7 @@ int main()
   Point point { 10, 56 };
   point.print();
 }
-}}}
+```
 
 constructors should not be `const`: this is because it needs to modify member variables which cannot be achieved if `const`
 
@@ -721,7 +721,7 @@ constructors should not be `const`: this is because it needs to modify member va
 `Constructor member initializer lists`
 ====================================
 to allow constructors initialize member variable we can use the `member initialization list`.
-{{{cpp
+```cpp
 #include <iostream>
 
 class Foo
@@ -747,13 +747,13 @@ int main()
   Foo foo { 6, 7 };
   foo.print();
 }
-}}}
+```
 
 Member initialization order
 ---------------------------
 the c++ standard says the members should be initialized in the order they are declared: meaning defining costructer member initilizeer lists to initialize in the wrong order can be problematic:
 case example:
-{{{cpp
+```cpp
 #include <iostream>
 #include <algorithm>
 
@@ -778,7 +778,7 @@ int main()
   Foo foo { 5, 6 };
   foo.print();
 }
-}}}
+```
 
 on my mcahine it prints:
 `Foo(0, 6)`
@@ -804,7 +804,7 @@ Members can be initialized in a few different ways:
 Constructor function bodies
 ---------------------------
 Prefer using the member initializer list to initialize your members over assigning values in the body of the constructor.
-{{{cpp
+```cpp
 #include <iostream>
 #define NOT_INIT
 
@@ -835,14 +835,14 @@ public:
 };
 
 int main() { }
-}}}
+```
 
 
 `Default constructors and default arguments`
 ==========================================
 
 a default constructor is a constructor that accpets no argument. typically its a constructor that has been defined with no paramters.
-{{{cpp
+```cpp
 class Foo
 {
 public:
@@ -851,21 +851,21 @@ public:
     std::cout << "Foo is a default constructer";
   ]
 }
-}}}
+```
 
 Value initialization vs default initialization for class types
 --------------------------------------------------------------
 we should prefere value initialization to default initialization because safer for aggregates and since its difficult to tell by glance if a class tyoe is an aggregate or not
 its safer to use `value initialization`.
-{{{cpp
+```cpp
 Foo foo{};      // value init.tion    : still calls constructor
 Foo foo2;       // default init.tion  : still calls constructor
-}}}
+```
 
 Constructors with default arguments
 -----------------------------------
 just as normal function: constructors can have default arguments:
-{{{cpp
+```cpp
 class Foo
 {
 private:
@@ -876,14 +876,14 @@ public:
   {
   }
 };
-}}}
+```
 
 if all the paramters of a constructor has default arguments then the constructor is a default constructor becaule it can be called with no arguments
 
 Overloaded constructors
 -----------------------
 constructors can be overloaded:
-{{{cpp
+```cpp
 class Foo
 {
 private:
@@ -900,7 +900,7 @@ public:
     std::cout << "Foo(" << x << ", " << y << ") constructed\n";
   }
 };
-}}}
+```
 
 despite we can do this classes should only have one conctructor:
     this is becasue if the compiler encounters an ambigous constructor call and doesnt know which
@@ -915,7 +915,7 @@ Using `= default` to generate a default constructor
 -------------------------------------------------
 in cases were would write a default constructor that is similar to the imeplicitly generated default contructor we can tell the compiler to generate
 an implicit default constructor for use by using the following syntax:
-{{{cpp
+```cpp
 class Foo
 {
 private:
@@ -938,7 +938,7 @@ int main()
   return 0;
 }
 
-}}}
+```
 
 Implicit default constructor vs empty user constructor
 ------------------------------------------------------
@@ -954,7 +954,7 @@ but contructors are akllowed to transfer redponsibility of initialization to ano
 and such constructors are known as deleagting constructors.
 
 an example of constructor delegating:
-{{{cpp
+```cpp
 #include <iostream>
 #include <string>
 #include <string_view>
@@ -976,7 +976,7 @@ public:
     std::cout << "Employee " << m_name << " created\n";
   }
 };
-}}}
+```
 
 a few notes on deleagting constructors:
 1) they are not alowwed to initialize members themeselves: so your constructors can either initialize or deleagte but not both.
@@ -1000,7 +1000,7 @@ this are anonymous rvalue objects with no name that posses a lifetime equal to t
 they are also known as `temporary objects`, `anonymous objects` or `unamed objects`.
 
 wasys of creating anonymous objeects:
-{{{cpp
+```cpp
 
 class IntPair
 {
@@ -1034,10 +1034,10 @@ int main()
 
   return 0;
 }
-}}}
+```
 
 we can also use temporary objects in functions return:
-{{{cpp
+```cpp
 #include <iostream>
 
 class IntPair
@@ -1077,7 +1077,7 @@ int main()
 
   return 0;
 }
-}}}
+```
 
 A few notes
 -----------
@@ -1100,7 +1100,7 @@ read this: it does memberwise initializaton construction and its implicit in nat
 Defining your own copy constructor
 ----------------------------------
 it takes in a reference of an object of the same type and initializes its members with the members of the passed in object member_wisely.
-{{{cpp
+```cpp
 #include <iostream>
 
 class Fraction
@@ -1131,7 +1131,7 @@ int main()
   Fraction fCopy { f };                 // Fraction (const Fraction&) is called: this is a copy constructor.
   return 0;
 }
-}}}
+```
 
 copy constructors should have no side effects more than copying. if your relying on the copy constructor for other actions than copying that behaviour might not occur.
 
@@ -1151,7 +1151,7 @@ Pass by value (and return by value) and the copy constructor
 ------------------------------------------------------------
 if a class had no cpy constructor its implicitly gemerated by the compiler we can explicitly requst the compiler create a default constructor for us using the `= default` syntax.
 
-{{{cpp
+```cpp
 #include <iostream>
 
 class Fraction
@@ -1175,12 +1175,12 @@ public:
         std::cout << "Fraction(" << m_numerator << ", " << m_denominator << ")\n";
     }
 };
-}}}
+```
 
 Using = delete to prevent copies
 --------------------------------
 occassionaly we can run into scenarios where we dont wnt certain class objects to be copy-able we can prevent that using the `= delete` syntax.
-{{{cpp
+```cpp
 
 class Fraction
 {
@@ -1195,7 +1195,7 @@ int main()
   Fraction f { 1, 2 };
   Fraction fCopy { f };                                                 // compiler error: copy constructor cant be called so copies cannot be made.
 }
-}}}
+```
 
 For advanced readers (which i am not yet : o)
 ---------------------------------------------
@@ -1253,7 +1253,7 @@ by default all constructors are converting constructor.
 Only one user-defined conversion may be applied
 -----------------------------------------------
 in the code below: we mitght expect the conversion to be legal anc work but it doesnt: `onty one user-defined conversion may be applied`:
-{{{cpp
+```cpp
 #include <iostream>
 #include <string>
 #include <string_view>
@@ -1281,7 +1281,7 @@ int main()
 {
   printEmployee("Joe");                 // passes in a C-styled string which is passed into the Employee argument of the function.
 }
-}}}
+```
 
 here the compiler throws a compiler error: conversion constructors only allow one user-defined conversion.
 exactly and precisely, only one. two or more a compiler error is thrown like the code above.
@@ -1294,23 +1294,23 @@ lest break the process in the above snippet:
 
 there are 2 ways of making this work:
 1) passing in the arguemnt as the preferref type prevent double conversion:
-{{{cpp
+```cpp
 int main()
 {
   using namespace std::literals;
   printEmployee("John"sv);                      // this is now a  string_view literal: no need for double conversion.
   return 0;
 }
-}}}
+```
 
 1) making an anonymous object and passing that as an arguemnt: now there no need for conversion just member-copying:
-{{{cpp
+```cpp
 int main()
 {
   printEmployee( Employee{ "Joe" } );         // passing in an anonymous object with the data we want initialized into it.
   return 0;
 }
-}}}
+```
 
 When converting constructors go wrong
 -------------------------------------
@@ -1322,7 +1322,7 @@ making a constructor `explicit` has 2 notable consequences:
 
 when the `explicit` kwyword is used its tells te compiler not to allow implicit conversions when using constructors only explicitly constructed values.
 an example:
-{{{cpp
+```cpp
 #include <iostream>
 
 class Dollar
@@ -1347,21 +1347,21 @@ int main()
 {
   print(5);                       // illegal: no implicit conversions allowed.
 }
-}}}
+```
 
 Explicit constructors can be used for direct and list initialization
 --------------------------------------------------------------------
-{{{cpp
+```cpp
 Dollar one (1);                   // allowed: direct initialization is allowed.
 Dollar two {2};                   // allowed: direct list initialization is allowed.
 Dollar three = 3;                 // illegal: copy initialization is not allowed.
-}}}
+```
 
 Return by value and explicit constructors
 -----------------------------------------
 with explicit constructors returned object that can be impicitly converted to match the return type of a function is also not allowed.
 same principle as passing unmatching typed object an argument to functions parameter.
-{{{cpp
+```cpp
 
 class Foo
 {
@@ -1381,7 +1381,7 @@ Foo getFoo()
   return { 5 };               // illegal: implicit conversion needed.
   return {};                  // illegal: implicit conversion needed.
 }
-}}}
+```
 
 
 Best practices for use of explicit
