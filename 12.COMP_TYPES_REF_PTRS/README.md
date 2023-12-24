@@ -44,14 +44,14 @@ The value category of an expression
 -----------------------------------
 
 consider this code:
-{{{cpp
+```cpp
 int main()
 {
   int x{ 8 };
   x = 8;                    // this is fine
   8 = x;                    // error.
 }
-}}}
+```
 
 int the above example we can see that its fine assigning an int value to the variable `x` but why can we assign `x` to an int literal? how does the
 compiler know what assignement is right? this is were the `value category` or expressions comes in play.
@@ -67,8 +67,8 @@ in c++11, three additional value categories where added:
 3) xvalue
 this was all to support a new feature called `move semantics`.
 
-[[Lvalue and rvalue expressions]]
-
+Lvalue and rvalue expressions
+-----------------------------------------------
 lvalues
 -------
 an lvalue (or `left value` or `locator value`) is a value that evaluates to an identifiable object, function or bitfield.
@@ -84,7 +84,7 @@ rvalues also known as right values is an expression that is not an lvalue. Commo
 and the return value of function and operators that return by value.
 Rvalues arent identifiable (meaning they hav to be used immediately) and are only used in the scope of the expression they are used.
 
-{{{cpp
+```cpp
 int return5()
 {
   return 5;
@@ -104,14 +104,14 @@ int main()
 
   return 0;
 }
-}}}
+```
 
 and this is why we cant `8 = x` in pur previous example, for clarity: the `=` operator requires the left operand to be a modifiable lvalue and the right an rvalue expression.
 
 Tip on determining if a value is an lvalue or rvalue
 ----------------------------------------------------
 the `&`operator compiles if used beside an lvalue and does not with an rvalue;:
-{{{cpp
+```cpp
 
 int foo()
 {
@@ -124,18 +124,18 @@ int main()
   &6;                       // does not compile:         rvalue expression
   &foo();                   // does not compile:         rvalue expression
 }
-}}}
+```
 
 Lvalue to rvalue conversion
 ---------------------------
 lvalues implicilty converts to rvalues thats why they can be used where rvalues can be used:
-{{{cpp
+```cpp
 int x{ 7 };
 int y{ 5 };
 
 y = x;                    // this is fine because of lvalues implicit comversion to rvalues: in this case x was converted.
 x = x + 1;                // also valid due to the reason above.
-}}}
+```
 
 A rule of thumb to identify lvalue and rvalue expressions
 ---------------------------------------------------------
@@ -160,27 +160,27 @@ Lvalue reference types
 an lvalue reference is a refernence that acts as an alias for an existing lvalue such as a variable.
 
 to declare an lvalue reference type use an ampersand in its decleration:
-{{{cpp
+```cpp
 int             // normal int type
 int&            // a reference to an int object
 double&         // a reference to a double object
-}}}
+```
 
 Lvalue reference variables
 --------------------------
 one thing we can do with lvalue refernces is to create an `lvalue refernce variable`: a variable that acts as a reference to an lvalue object.
-{{{cpp
+```cpp
 int main()
 {
   int x{ 9 };
   int& ref{ x };                // lvalue reference variable: reference to the lvalue x.
 }
-}}}
+```
 
 Modifying values through an lvalue reference
 --------------------------------------------
 we use refernces just as we use the variables we refernece them with:
-{{{cpp
+```cpp
 #include <iostream>
 
 int main()
@@ -194,12 +194,12 @@ int main()
   x = 11;
   std::cout << ref << '\n';
 }
-}}}
+```
 
 Initialization of lvalue references
 -----------------------------------
 much like constants, references must be initialized.
-{{{cpp
+```cpp
 int main()
 {
   int& invalidRef;                          // error: references must be initialized.
@@ -210,7 +210,7 @@ int main()
   const int seven{ 7 };
   int invalidRef{ seven }                   // references cannot bind to a non-modifiable value.
 }
-}}}
+```
 
 when a refernces is initialized with an object or function we say its bound to that object or function: this process is known as `reference binding`
 the object or function being referenced is sometimes called the `referrent`.
@@ -222,7 +222,7 @@ of unmodifiable lvalues (or rvalues).
 refernces only refernces objects of the same type as itself (there are exceptions tho).
 lvlaue refernces to void are illegal(what would be the point?).
 
-{{{cpp
+```cpp
 int main()
 {
   int x{ 5 };
@@ -231,12 +231,12 @@ int main()
   double y{ 8.2 };
   int& invalidRef{ y };         // ilegall: can't bind to an object with differnt type.
 }
-}}}
+```
 
 References can’t be reseated (changed to refer to another object)
 -----------------------------------------------------------------
 once an references is binded to an object it cant be reseated: meaning that it cant be changed to references another object.
-{{{cpp
+```cpp
 #include <iostream>
 
 int main()
@@ -248,7 +248,7 @@ int main()
 
   ref = y;                  // legal: but some might expect ref to bind to x as its new reference, but it doesn not. it assignes the value of x to y.
 }
-}}}
+```
 
 Lvalue reference scope and duration
 -----------------------------------
@@ -260,7 +260,7 @@ they both have independent lifetimes meaning:
 1) A refernces can be desrtoyed before its referent.
 2) An object being referenced can be destroyed before its reference.
 
-{{{cpp
+```cpp
 int main()
 {
   int x{ 8 };
@@ -272,7 +272,7 @@ int main()
 
   std::cout << x << '\n';
 } // x dies here.
-}}}
+```
 
 Dangling references
 -------------------
@@ -292,10 +292,10 @@ Lvalue references to const
 Introduction
 ------------
 we can make lvalue references bind to a non-modifiable lvalue by declaring the reference with the const keyword:
-{{{cpp
+```cpp
 const int x{ 9 };
 const int& ref { x };                 // lvalue reference to a const: legal with the const keyword.
-}}}
+```
 
 sine they are binded to const they can only be used to access not modify.
 
@@ -312,14 +312,14 @@ Temporary objects have no scope because they have no identifier (and scope is a 
 but the thing is thet references outlive the lifteime of temporary objects ans subject the temporary objects they are binded to inherit the same lifespan the
 references themselves have (which is `block scope` with `automatic duration`)
 
-{{{cpp
+```cpp
 int main()
 {
   const int& ref{ 5 };                // anonymous object binded to const reference ref. lifrtime extended to match ref.
   // do stuff with ref here
   return 0;
 } // anonymous object with value 5 and ref dies here.
-}}}
+```
 
 note:
 - lvalue references can only bind to modifiable lvalues
@@ -333,7 +333,7 @@ this is because static objects address in memory are known by the compiler at co
 
 they cannot be binded to local variables because their addresses are not known until the function they are scoped in is called, which the local variables are then
 instantiated to have addresses.
-{{{cpp
+```cpp
 int g_x{ 5 };
 
 int main()
@@ -346,13 +346,13 @@ int main()
   int x{ 15 };
   [[maybe_unused]] constexpr int& ref3 { x };     // illegal: x is not static.
 }
-}}}
+```
 
 when defining a constexpr reference to a static const variable we need to apply both the constexpr and const keywords to the variable:
-{{{cpp
+```cpp
 static const int s_cx { 10 };
 [[maybe_unused]] constexpr const int& ref { s_cx };
-}}}
+```
 
 Pass by lvalue reference
 ========================
@@ -365,7 +365,7 @@ this issue is addressed easily with addresses.
 Normal function calls
 ---------------------
 now consider a case where we want to call a function to modify a value in the callers scope we mught do something like this with normal argument passing:
-{{{cpp
+```cpp
 #include <iostream>
 
 void plusOne(int x)
@@ -379,7 +379,7 @@ int main()
   plusOne(x);               // 1) the value in variable x is copied into int x of plus one: both are now independent variables with the same value
   std::cout << x << '\n';   // 4) no change to x: x remains the same
 }
-}}}
+```
 
 due to function calls having parrallel scopes (independent scopes), we cannot ordinarily pass a value in one function to another and expect the function
 to modify the passed in variable from its caller in its scope (scope of the called function).
@@ -402,7 +402,7 @@ with pass with reference we can just use one object modify or utilize it another
 this prevenets us form making expensive copies.
 
 inexpesive argument passing:
-{{{cpp
+```cpp
 #include <iostream>
 #include <string>
 
@@ -416,10 +416,10 @@ int main()
   std::string x { "Hello Cuck Suckers!" };
   printValue( x );                              // inexpensive because x is passes into a reference so no duplication occurs.
 }
-}}}
+```
 
 modified argument reflecting in callers function:
-{{{cpp
+```cpp
 #include <iostream>
 
 int plusOne(int& x)
@@ -436,7 +436,7 @@ int main()
   //x has been modified.
   std::cout << x << '\n';
 }
-}}}
+```
 
 Pass by reference can only accept modifiable lvalue arguments
 -------------------------------------------------------------
@@ -451,12 +451,12 @@ Passing by const reference offers the same primary benefit as pass by reference 
 being referenced.
 
 this is not allowed:
-{{{cpp
+```cpp
 void addOne(const int& ref)
 {
   ++ref; // not allowed: ref is const
 }
-}}}
+```
 
 NOTE:
 ----
@@ -479,7 +479,7 @@ NOTE:
 The cost of pass by value vs pass by reference
 ----------------------------------------------
 thus us a helper macro that tells if a datatype is cheap to copy:
-{{{cpp
+```cpp
 #include <iostream>
 
 #define isSmall(T) (sizeof(T) <= 2*sizeof(void *))  // this is the helper macro
@@ -498,7 +498,7 @@ int main()
   std::cout << isSmall(double);         // yes: favour pass by value
   std::cout << isSmall(S);              //  no: favour const referencing.
 }
-}}}
+```
 
 For function parameters, prefer std::string_view over const std::string& in most cases
 --------------------------------------------------------------------------------------
@@ -512,7 +512,7 @@ Introduction to pointers
 
 Pointer initialization
 ----------------------
-{{{cpp
+```cpp
 int main()
 {
   int x{ 5 };
@@ -521,7 +521,7 @@ int main()
   int* ptr_1{};     // a null pointer
   int* ptr_1{ &x }; // initialized pointer pointing to x.
 }
-}}}
+```
 
 pointers can only point to types that are the same with the type they are.
 pointers cant be initialized with literal values or addresses-like-values they will be treated as ints or other fundamental types
@@ -533,13 +533,13 @@ we can use the assignement operator on pointers for 2 uses:
 1) To change the value of the address that the pointer is pointing to.
 2) to change the value being pointed at (by assigning the dereference operator)
 
-{{{cpp
+```cpp
 int x{ 6 };
 int y{ 7 };
 int* ptr{ &x };                 // pointer initialized to point to x
 ptr = &y;                       // pointer now points to y
 *ptr = 10                       // pointer has now changed the value stored in y by dereferencing.
-}}}
+```
 
 Similarities and differences of pointers and references
 -------------------------------------------------------
@@ -555,7 +555,7 @@ The address-of operator returns a pointer
 -----------------------------------------
 the address operator is mistaken to return a hexadecimal address but in actuality what happens is that the address is converted to a pointer housing that address
 and that is what is returned back.
-{{{cpp
+```cpp
 #include <iostream>
 #include <typeinfo>
 
@@ -565,7 +565,7 @@ int main()
   std::cout << typeid(&x).name() << '\n';   // this prints `Pi` or `int *` deending on your compiler
   return 0;
 }
-}}}
+```
 
 The size of pointers
 --------------------
@@ -588,20 +588,20 @@ Null pointers
 
 beides objects address theres one additional value pointers can hold and that is a `null value`. a null value (or simply null) is a value that means something has no value.
 when a pointer is holding a null value it means that the pointer is pointing to nothing. easiste way ot create a null pointer is using value initialization:
-{{{cpp
+```cpp
 int main()
 {
   int* ptr{};             // null pointer, its holds no address
   return 0;
 }
-}}}
+```
 
 value initialize your pointer it be null unless initualizing them with a valid address.
 
 The nullptr keyword
 -------------------
 the `nullptr` keyword represents a noil pointer literal. we use it to explicitly initialize a null pointer.
-{{{cpp
+```cpp
 int main()
 {
   int* ptr { nullptr };     // null pointer
@@ -612,12 +612,12 @@ int main()
   someFunc(nullptr);        // we can also use the nullptr for arguments that require a pointer.
   return 0;
 }
-}}}
+```
 
 Dereferencing a null pointer results in undefined behavior
 ----------------------------------------------------------
 dereferncing a null pointer leads to UB that should crash the program (usually with a seg fault): you can try it with this snippet:
-{{{cpp
+```cpp
 #include <iostream>
 
 int main()
@@ -625,43 +625,43 @@ int main()
   int* ptr{};
   std::cout << "crashe-" << *ptr << '\n'
 }
-}}}
+```
 
 Checking for null pointers
 --------------------------
 1) method 1: explicitly compare with the nullptr literal keyword.
 
-{{{cpp
+```cpp
 int* ptr{};
 
 if (ptr == nullptr)
   // do stuff
 else
   // okay its not null so do stuff
-}}}
+```
 
 2) method 2: null pointers evaluate to false so placing them in a conditional like that should evaluate to tell you if its null or not.
 
-{{{cpp
+```cpp
 int* ptr{};
 
 if (ptr)
   // its null do something
 else
   // its not null do another thing
-}}}
+```
 
 Legacy null pointer literals: 0 and NULL
 ----------------------------------------
 0 and `NULL` are used in legacy code to initialize null pointers:
-{{{cpp
+```cpp
 int main()
 {
   int* ptr { NULL };           // this is a null pointer: not advisable tho
   int* ptr2;                   // unitiaized: holds garbage address
   ptr2 = 0;                    // now a null pointer: not advisable
 }
-}}}
+```
 
 NOTE:
 ----
@@ -679,26 +679,26 @@ Pointers and const
 ==================
 
 prevously we initilizie pointers to address to mutable objects what of const non-mutable objects?:
-{{{cpp
+```cpp
 int main()
 {
   const int x{ 5 };
   int* ptr{ &x };                   // error.
 }
-}}}
+```
 
 we would expect thus to works but it doesnt because we can assigne the address of a `const int` to a pointer that points to `int`: becuae logically we should
 be able to defer and manipulate what `int` we are pointing to but thats not that case, because we arent pointing to an `int` we are pointing to a `const int`
 which is not the same and violates the constness of the varibale.
 
 to fix this we use the const keyword before the `int` to declare a pointer to a `const int` not just `int`:
-{{{cpp
+```cpp
 int main()
 {
   const int x{ 5 };
   const int* ptr{ &x };              // legal
 }
-}}}
+```
 
 this applies to any datatype.
 
@@ -710,28 +710,28 @@ should legally point to any `const int` object, therefore it can be resaeted and
 
 to declare a pointer that cannot point to a differnt object after initialized we need to declare a `const pointer` to do this we use the const keyword after the
 asterisks in the pointers declaration:
-{{{cpp
+```cpp
 int main()
 {
   int x{ 5 };
   int* const ptr{ &x };             // now ptr cannot be assigned to another address: a const pointer.
 }
-}}}
+```
 
 although since, in this example, the datatype it points to is a non-const int, it can be derefernced and have its value changed.
 
 Const pointer to a const value
 ------------------------------
 they point to const datatypes and cannot be resaeted:
-{{{cpp
+```cpp
 const int x { 8 }
 const int* const ptr { &x };        // example of a const pointer to a const value of type int.
-}}}
+```
 
 Pass by address
 ---------------
 c++ provides another method of passing in arguments that isnt by reference or by value: and this is passing by `address`.
-{{{cpp
+```cpp
 #include <iostream>
 
 void someFcn(double* x)
@@ -744,7 +744,7 @@ int main()
   double num{ 9.0 };
   someFcn(&num);
 }
-}}}
+```
 
 passing arguments by address prevents object duplication which saves memory footprint in a program: because we use pointers to refer to the objects
 we can also derefernce the object and modify its value. like in the example above.
@@ -757,7 +757,7 @@ thereby reducing memory footprint.
 Null checking
 -------------
 obeserving this simple program one mighy not even recongnize a fault in its design:
-{{{cpp
+```cpp
 #include <iostream>
 
 void print(int* ptr)
@@ -775,11 +775,11 @@ int main()
 
 	return 0;
 }
-}}}
+```
 
 thsi progran will only print 5 and then crash: this is because we didnt `null check`: null checking is a precaution we impleent to make sure a pointer isnt `wild`
 or `null` (simply its to check if a pointer is not null). we can edit the above code with null checking into:
-{{{cpp
+```cpp
 void print(int *ptr)
 {
   // null check here: at the entry of the function
@@ -799,12 +799,12 @@ int main()
 
 	return 0;
 }
-}}}
+```
 
 this way before the function executes its checked to prevent seg fault.
 
 we can also use the `assert()` function macro to assert if the the pointer is null and halt:
-{{{cpp
+```cpp
 void someFcn(int* ptr)
 {
   assert(ptr);
@@ -813,7 +813,7 @@ void someFcn(int* ptr)
   if(!ptr)
     return; // precaution action incase not in debug mode.(production mode)
 }
-}}}
+```
 
 Prefer pass by (const) reference
 --------------------------------
@@ -825,7 +825,7 @@ Rule of Thumb:
 -------------
 use pass with reference when you can and use pass with address when you must.
 
-{{{cpp
+```cpp
 #include <iostream>
 
 void passByValue(int a)
@@ -849,7 +849,7 @@ int main()
   passByReference(5);   // legal, refers to the same int literal 5, no memory duplication:    efficient
   passByAddress(5);     // illegal: cant pass in rvalues into pointers                        should have been effeicent but impossible.
 }
-}}}
+```
 
 
 Pass by address (part 2)
@@ -858,7 +858,7 @@ Pass by address (part 2)
 Pass by address for “optional” arguments
 ----------------------------------------
 one of the reasons that passing in address are for optional arguments, example:
-{{{cpp
+```cpp
 #include <iostream>
 
 void greet(std::string* name=nullptr)
@@ -874,10 +874,10 @@ int main()
   greet(&name);                 // also works with a passed in string name (treating this argument as optional)
   return 0;
 }
-}}}
+```
 
 this could also be achieved by function overloading:
-{{{cpp
+```cpp
 void greet(std::string_view name)
 {
   std::cout << "Hello" << name << '\n';
@@ -898,7 +898,7 @@ int main()
 
   return 0;
 }
-}}}
+```
 
 Changing what a pointer parameter points at
 -------------------------------------------
@@ -908,7 +908,7 @@ this can be acieved by using a refeence to a pointer.
 Pass by address… by reference?
 ------------------------------
 this is simply done by placing an ampersand symbol after the pointer type decaration as follows:
-{{{cpp
+```cpp
 void nullify(int*& refptr)
 {
   refptr = nullptr;
@@ -923,7 +923,7 @@ int main()
   nullify(ptr);
   std::cout << "ptr is " << (ptr ? "not-null" : "null") << '\n';
 }
-}}}
+```
 
 Why using 0 or NULL is no longer preferred (optional)
 -----------------------------------------------------
@@ -936,7 +936,7 @@ std::nullptr_t (optional)
 -------------------------
 if `nullptr` is not of type int, it is of type `std::nullptr_t` in the `<cstddef>` header and it can only hold one value: `nullptr`
 while it might seem slly: its useful in situation where we want the only argument a function accepts be the `nullptr` literal.
-{{{cpp
+```cpp
 #include <cstddef>
 #include <iostream>
 
@@ -957,7 +957,7 @@ int main()
   int x{ 5 };
   print(&x);                // calls function: int print (int*)
 }
-}}}
+```
 
 
 Return by reference and return by address
@@ -969,7 +969,7 @@ Return by reference and return by address
 - It’s okay to return reference parameters by reference
 - It’s okay to return by const reference an rvalue passed by const reference
 - when a non const reference is returend from a function the caller can use the reference to modify the referent:
-{{{cpp
+```cpp
 #include <iostream>
 
 int& max(int& x, int& y)
@@ -986,7 +986,7 @@ int main()
   std::cout << a << ' ' << b << '\n';
   return 0;
 }
-}}}
+```
 
 Return by address
 -----------------
@@ -1008,7 +1008,7 @@ returns acts as an output for the caller.
 
 this provides a way for the function to return data back to its caller in scenarios where using its return will not be sufficient for some reason.
 exmple:
-{{{cpp
+```cpp
 #include <cmath>
 #include <iostream>
 
@@ -1033,7 +1033,7 @@ int main()
 
   std::cout << "Degrees: " << degrees << "\nCos: " << cos << "\nSin: " << sin << '\n';
 }
-}}}
+```
 
 When to pass by non-const reference
 -----------------------------------
@@ -1051,7 +1051,7 @@ things that type deduction drops:
 2) and `REFRENCES`
 
 example:
-{{{cpp
+```cpp
 std:string& getStringRef()
 {
   //
@@ -1061,10 +1061,10 @@ int main()
 {
   auto ref{ getStringRef() };         // evaluates into std::string and drope the reference attribute.
 }
-}}}
+```
 
 just like the const and constexpr they can be reapplied:
-{{{cpp
+```cpp
 std::string& getRef()
 {
 //
@@ -1074,14 +1074,14 @@ int main()
 {
   auto& ref{ getRef };              // evaluates to std::string&
 }
-}}}
+```
 
 Top-level const and low-level const
 -----------------------------------
 a `top-level const` qualifier that applies to the object itself.
 when it applies to the type its a low-level.
 
-{{{cpp
+```cpp
 // top-level const
 const int  a;                          // applies to the object so it top-level
 int* const b;                          // applies to the object also so its top-level.
@@ -1092,12 +1092,12 @@ const int* ptr;                        // applies to the object being pointed to
 
 // both types of const.
 const int* const both;                 // both low and high level const itssss MEGA level!
-}}}
+```
 
 Type deduction and const references
 -----------------------------------
 first the reference attribute is dropped and then any top-level const is dropped from the result.
-{{{cpp
+```cpp
 #include <string>
 
 const std::string& getConstRef()
@@ -1109,7 +1109,7 @@ int main()
 {
   auto ref1{ getConstRef };               // refenceis dropped first, then any top level const: leaving std::string.
 }
-}}}
+```
 
 if they are needed thye should be reapplied.
 
@@ -1124,7 +1124,7 @@ they work the same way as const references
 Type deduction and pointers
 ---------------------------
 unike references, tyoe deduction does not drop pointers.
-{{{cpp
+```cpp
 #include <string>
 std::string* getPtr();
 
@@ -1134,7 +1134,7 @@ int main()
   // we can also use the * symbol to make our intentions clearer
   auto* re_2 { getPtr() };            // std::string*
 }
-}}}
+```
 
 The difference between auto and auto*
 -------------------------------------
@@ -1143,7 +1143,7 @@ it sowuld evaluate sto type: `std::string`. After that the pointer symbol is rea
 where `x` is a datatype
 
 there can be some isseus with `autu*` decalrations and one of them is illustrated below:
-{{{cpp
+```cpp
 #include <string>
 
 std:string* getPtr();     // some function that returns a pointer
@@ -1154,14 +1154,14 @@ int main()
   auto* ptr1 ( *getPtr() );                 // here a pointer is returnd which is derefed to yeilding an std::string then the pointer attribute is applied
   // making it evalue=ste to std::string* which cannot hold an std::string therefore compile error.
 }
-}}}
+```
 
 the auto keywrod also drop reference attributes: if they are needed they have to be reapplied.
 
 Type deduction and const pointers Optional
 ------------------------------------------
 ltes look and examine the code below:
-{{{cpp
+```cpp
 #include <string>
 
 std::string* getPtr();
@@ -1174,14 +1174,14 @@ int main()
   const auto* ptr_3 { getPtr() };     // evaluates to const std::string*
   auto* const ptr_4 { getPtr() };     // evaluates to std::string* const
 }
-}}}
+```
 
 in the above code we see the only arragement where auto is evaluated as: `const std::string*` is the format: `const auto*`.
 the rest the pattern of arrngement is not followed and they are evaluated to `std::string* const`.
 
 NOTE:
 -----
-{{{cpp
+```cpp
 #include <string>
 
 int main()
@@ -1203,5 +1203,5 @@ int main()
 
   return 0;
 }
-}}}
+```
 
