@@ -1,24 +1,24 @@
 BASICS SYNTAXES IN C++,
 Author: Felix Okoronkwo
 
-==Intoduction to the Basics==
+Intoduction to the Basics
+=========================================================================
+STATEMENTS
+-----------------------------------------------Defination : this is the smallest independent unit of computaion in c++
 
-[[STATEMENTS]]
-Defination : this is the smallest independent unit of computaion in c++
-
-{{{cpp
+```cpp
   // statement in cpp
   std::cout << "Hello, World!" << std::endl;
-}}}
+```
 
 most (but not all) statements in c++ end with a semicolon `;`.
 
-[[FUNCTION AND MAIN FUNCTION]]
-Defination : this is a collection of statements that are executed in order sequentially top to bottom.
+FUNCTION AND MAIN FUNCTION
+-----------------------------------------------Defination : this is a collection of statements that are executed in order sequentially top to bottom.
 Every c++ program must have a main function which is the entry point of the program.
 the name of the function is always *main*. function perform specific jobs.
 
-{{{cpp
+```cpp
   #include <iostream>             // preprocessor directive
 
   int main ()                     // main function
@@ -26,14 +26,14 @@ the name of the function is always *main*. function perform specific jobs.
     std::cout << "text";          // statement
     return 0;                     // return statement.
   }
-}}}
+```
 
-[[COMMENTS]]
-Single line : `// this is a single line comment`
+COMMENTS
+-----------------------------------------------Single line : `// this is a single line comment`
 Multiline : `/** multiline comment ** /`
 
-[[OBJECTS AND VARIABLES]]
-C++ access memory for data manipulation through objects
+OBJECTS AND VARIABLES
+-----------------------------------------------C++ access memory for data manipulation through objects
 
 Object : Region of storage usually memory that can store data or a value and has other associated properties.
 
@@ -41,51 +41,51 @@ Objects can be named or anonymous.
 A named object is known as a *variable* and its name its known as an *identifier*.
 In C++ direct memory acces is dicouraged, it should be done indirectly through objects.
 
-==VARIABLE INSTANTIATION, DEFINATION, TYPES, ASSIGNMENT AND ASSIGNMENT==
-c++ is statically typed programing languaage and this means just like in C
+VARIABLE INSTANTIATION, DEFINATION, TYPES, ASSIGNMENT AND ASSIGNMENT
+=========================================================================c++ is statically typed programing languaage and this means just like in C
 a variable's type must be stated whenever defining a variable/object
 
-{{{cpp
+```cpp
   int a, b;
   double index;
   int c; double h;             // correct but not best practice
-}}}
+```
 
-[[Instantiation]]
-at runtime programs are instatiated this is when objects and variables are
+Instantiation
+-----------------------------------------------at runtime programs are instatiated this is when objects and variables are
 created and assigned a memory address for future manipulation or access.
 variables must be instantiated bfoere the can be used to store values.
 an instatiated object is called an *Instance*.
 
-[[Datatypes]]
-datatypes of an obkject or variable must be known at compile time
+Datatypes
+-----------------------------------------------datatypes of an obkject or variable must be known at compile time
 and variables onl stored the data of the same datatype as the variable itself,
 as stated above (*statically-typed*).
 
-[[Varible structure]]
-variables possess an *identifier*, *type* and *value*.
+Varible structure
+-----------------------------------------------variables possess an *identifier*, *type* and *value*.
 
-[[Variable declaration]]
-telling the compiler that a variable exists without allocating memory for it.
+Variable declaration
+-----------------------------------------------telling the compiler that a variable exists without allocating memory for it.
 
-[[Variable defination]]
-telling the compiler that a variable exists and allocating memory for it.
+Variable defination
+-----------------------------------------------telling the compiler that a variable exists and allocating memory for it.
 
-[[Variable assignment]]
-cassigning a value for a variable to hold in its storage after defination.
+Variable assignment
+-----------------------------------------------cassigning a value for a variable to hold in its storage after defination.
 
-{{{cpp
+```cpp
   extern int declared;
   int defined;
   defined = 0;                //assigned.
   defined = 69;               // re-assignment to 69
-}}}
+```
 
-==Variable assignment and Initialization==
-[[Initialization]]
-This is defining a variable then giving it an initial value
+Variable assignment and Initialization
+=========================================================================Initialization
+-----------------------------------------------This is defining a variable then giving it an initial value
 
-{{{cpp
+```cpp
 
   int a;          // no initializer (default initialization)
   int b = 7;      // copy initialization
@@ -96,36 +96,36 @@ This is defining a variable then giving it an initial value
   int e = { 7 };  // copy list initialization
   int f {};       // empty list initialization
 
-}}}
+```
 
-[[Default Initialization]]
-When a variable is declared with no initializer it is known as default initialization
+Default Initialization
+-----------------------------------------------When a variable is declared with no initializer it is known as default initialization
 in most cases default initialization leaves the variable with an indeterminate value.
 
-[[Copy Initialization]]
-This was inherited from C (initializing the variable with a `=` to assign the value)
+Copy Initialization
+-----------------------------------------------This was inherited from C (initializing the variable with a `=` to assign the value)
 Copy initialization had fallen out of favout in modern c++, duew to being less efficient than other types of
 initialization but C++17 remedied bulk of those issues, copy initialization is now finding new advocates
 
-[[Direct Initialization]]
-This initialization is provided inside brackets beside the indentifier of the variable
+Direct Initialization
+-----------------------------------------------This initialization is provided inside brackets beside the indentifier of the variable
 it was introduced to allow initialization of more complex objects (those with class types)
 One fo the reasons direct initialization has fallen out of favour is because it makes it hard
 to tell functions apart from variables
 
-{{{cpp
+```cpp
   int x();        // forward declaration of function, x.
   int x(5);       // direct initialization of varibale x.
-}}}
+```
 
-[[List Initialization]]
-Its a modern way to initialize objects using curly brackets in C++ , ts is also called
+List Initialization
+-----------------------------------------------Its a modern way to initialize objects using curly brackets in C++ , ts is also called
 uniform or brace initialization.
 Lit initialization diallows narrowing congversions.
 
-{{{cpp
+```cpp
   int width { 4.5 };  // since int cannot salfely hold a float an error is thrown using the list initialization
-}}}
+```
 
 Why list initialization intolerance to narrow conversions is relevant is because if the above initialization was
 done woth either direct or copy initializaion the fractional part would be dropped leaving only 4, data type
@@ -133,38 +133,38 @@ narrow conversion would have occured.
 
 Conversions that can ve donw without data loss are allowed though.
 
-[[Best Practice]]
-favoring initialization using braces
+Best Practice
+-----------------------------------------------favoring initialization using braces
 
-==Value Initialization and Zero Initialization==
-when a variable is initialized using list initialization with no value (with brackets), tight there the varibale is initilaized
+Value Initialization and Zero Initialization
+=========================================================================when a variable is initialized using list initialization with no value (with brackets), tight there the varibale is initilaized
 ans its initialized either to zero or empty depending on the data type.
 
-{{{cpp
+```cpp
   int width {};     // list initialization / zero initialization to value 0
-}}}
+```
 
-[[Unused variable initialization]]
-When initializing variables in c++, if that variable is not used the g++ compiler throws an
+Unused variable initialization
+-----------------------------------------------When initializing variables in c++, if that variable is not used the g++ compiler throws an
 `Unused Variable` error this can be bypassed by using an `[[maybe_unused]]` attribute for the variable
 that tells the compiler that this variable might be unused in the runtime of the program
 
-{{{cpp
+```cpp
   int main ()
   {
     [[maybe_unused]] int x { 5 };
     // uses the unsused variable attribute, therefore no warnings
     return 0;
   }
-}}}
+```
 
-==Introduction to iostream: cout, cin, and endl==
+Introduction to iostream: cout, cin, and endl
+=========================================================================
+The Input and Output Library
+-----------------------------------------------The `<iostream>` is a part of the c++ standard library that deals with basic input and output
 
-[[The Input and Output Library]]
-The `<iostream>` is a part of the c++ standard library that deals with basic input and output
-
-[[std::cout]]
-- its is part of the `<iostream>`
+std::cout
+------------------------------------------------ its is part of the `<iostream>`
 - it alows us to send data to the console to be printed out, the
   `cout` stands for character output, it is used together with the insertion operator `<<` to send the
   characters ot string to be printed to the console
@@ -175,7 +175,7 @@ The `<iostream>` is a part of the c++ standard library that deals with basic inp
   before the buffer has the opputunity to be flushed for printing, the data stored
   at the buffer, at that time of execution, will not be printed.
 
-{{{cpp
+```cpp
   #include <iostream>
 
   int main()
@@ -185,10 +185,10 @@ The `<iostream>` is a part of the c++ standard library that deals with basic inp
   }
 
   return 0;
-}}}
+```
 
-[[std::endl]]
-this is a variable in the `iostream` header that moves the printing cursor to a
+std::endl
+-----------------------------------------------this is a variable in the `iostream` header that moves the printing cursor to a
 new line.
 
 - using `std:endl` can be inefficent, it actually does 2 jobs:
@@ -196,7 +196,7 @@ new line.
   - flushes the `std:cout` buffer, which is not efficient
 - its preferable to use the `\n` charachter when printing on a newline
 
-{{{cpp
+```cpp
   #include <iostream>
 
   int main()
@@ -205,13 +205,13 @@ new line.
     std::cout << "This only moves to a newline \n";
     return 0;
   }
-}}}
+```
 
-[[std::cin]]
-This variable in the `iostream` library reads input from the keyboard using the
+std::cin
+-----------------------------------------------This variable in the `iostream` library reads input from the keyboard using the
 extraction opertaor `>>`.
 
-{{{cpp
+```cpp
   #include <iostream>
 
   int main()
@@ -222,12 +222,12 @@ extraction opertaor `>>`.
 	  std::cout << "you entered " << number << "\n";
 	  return 0;
   }
-}}}
+```
 
 - just as `std::cout` allows multiple outputs, `std::cin` allows multiple input
 - the multiple inputs are sepereated by a space delimeter
 
-{{{cpp
+```cpp
   #include <iostream>
 
   int main()
@@ -239,23 +239,23 @@ extraction opertaor `>>`.
 	  std::cout << "you entered " << number << "and "<< number1 << "\n";
 	  return 0;
   }
-}}}
+```
 
 - Note when initializing a variable with `std::cin` if the dataypes of the value and variable dont match `std::cin` will
   do a zero initialization for integers, dont know what happens to other non number based datatypes
 
-==Uninitialized variables and undefined Behaviour==
-Unlike other programming languages c/c++ do not initialize most variable to a given value
+Uninitialized variables and undefined Behaviour
+=========================================================================Unlike other programming languages c/c++ do not initialize most variable to a given value
 such as zero automatically, if a variable is created and a memory address is mapped to it store data it assumes the value of
 whatever garbage value is at that address.
 
-[[Recap]]
-- initialization : giving an object a value at the point of defination
+Recap
+------------------------------------------------ initialization : giving an object a value at the point of defination
 - Assignment     : the object is given a value at some point beyond defination
 - Unitialized    : the object has not been given a known value yet
 
-[[Undefined Behaviour]]
-These are behaviours that arise from implementing code that its behaviour is not
+Undefined Behaviour
+-----------------------------------------------These are behaviours that arise from implementing code that its behaviour is not
 decalared, by c++, on what might happen on execution.
 It may execute properly or not or even worse.
 You never know.
@@ -270,12 +270,12 @@ Conditions that might lead to `UB`:
 - Unsequenced Modification and Access
 - Overflowing Signed Integers
 
-[[Implementaion-defined behaviours]]
-This are program implementations that the results depend on the compiler to define,
+Implementaion-defined behaviours
+-----------------------------------------------This are program implementations that the results depend on the compiler to define,
 differnt compilers produce differnt results
 
-==Keywords and naming identifiers==
-C++ has a set of 92 reserved keywords for its own use.
+Keywords and naming identifiers
+=========================================================================C++ has a set of 92 reserved keywords for its own use.
 
 is also has special identifiers:
 - override
@@ -290,26 +290,26 @@ Rules for choosing identifiers:
 - must begin with a letter cannot stat with a number
 - C++ is case sensitive `nvalue` diff. from `nValue` and `NVALUE`
 
-[[Best practices for naming indentifier]]
-- Camel-case : `int variableName;`
+Best practices for naming indentifier
+------------------------------------------------ Camel-case : `int variableName;`
 - Snake_case : `int variable_name;`
 
-==Whitespace and basic formatting==
-Whitespaces are characters used for formatting purposes in c++ they are , newlines, tabs and space.
+Whitespace and basic formatting
+=========================================================================Whitespaces are characters used for formatting purposes in c++ they are , newlines, tabs and space.
 
 - quoted text strings seperated by nothing but whitespaces will be concatenated
 - statements may be splitted over multiple lines
 
 Concatenation example:
-{{{cpp
+```cpp
 int main()
 {
   std::cin << "This strings will be" "concatenated" "yuuuuuuup"
 }
-}}}
+```
 
-==Introduction to literals and operators==
-Literala are fixed values that are insterted directly into the source code,
+Introduction to literals and operators
+=========================================================================Literala are fixed values that are insterted directly into the source code,
 Literals ares also known as constant data because they do not change strings like
 `"hello world"` or fixed numbers like `5` are literals
 
@@ -324,8 +324,8 @@ Note:
 - literals values are placed directly into the executable and executables cannot be changed after compilation
 - Variables on the other hand are stored in memonry and can its value can be altered when needed.
 
-[[Opertaors]]
-C++ operators compirises of basic mathematical operators and the syntax regarding how they are used
+Opertaors
+-----------------------------------------------C++ operators compirises of basic mathematical operators and the syntax regarding how they are used
 is almost if not completely the same in mathematics or C.
 There are also operators without symbols, keyword opertaors e.g `new`, `delete` and `throw`.
 
@@ -336,24 +336,24 @@ Things operators do:
 - the back an forward shift operators return the `std::cout` IO stream variable that allows printing to the console
   which allows chaining and print concatenation.
 
-==Introduction to Expressions==
-An expression is comnination of literals, variables, operators and function calls to calculate a single value,
+Introduction to Expressions
+=========================================================================An expression is comnination of literals, variables, operators and function calls to calculate a single value,
 THre process of executing the expression to get a single value is known as an evaluation.
 And the single value produced is known as the result.
 
-[[Expressions Statements]]
-espressions by themselves cannot be compiled, that is why the have to be part of semicolon ending
+Expressions Statements
+-----------------------------------------------espressions by themselves cannot be compiled, that is why the have to be part of semicolon ending
 statements, but an expression can be converted to an executable statement by placing a semicolon at the end
 of the statement.
 
-{{{cpp
+```cpp
 int main()
 {
   std::cout << (x = 5) << '\n' ;   // this is a statement with nested expressions
   x = 5                            // this is one of the nested expression in the above statement (would result to an error)
   x = 6;                           // this is an expressions statement (semicolon added)
 }
-}}}
+```
 
 Note:
 - expressions are subset of statements
