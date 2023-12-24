@@ -822,7 +822,7 @@ Random numbers across multiple functions or files (Random.h)
 this is done with namespaces and inline variables in the header file.
 read up the details heres ince the notes where lost: [[http://www.learncpp.com/cpp-tutorial/generating-random-numbers-using-mersenne-twister/#RandomH]]
 
-```cpp: random.h
+```cpp
 #ifndef RAND_H
 #define RAND_H
 
@@ -872,7 +872,7 @@ namespace Random
 ```
 
 ussage:
-```cpp: main.cpp
+```cpp
 #include "random.h"
 
 int main()
