@@ -1,8 +1,8 @@
-= Operators =
-= Felix Okoronkwo Nov 1 =
+ Operators 
+ Felix Okoronkwo Nov 1 
 
  Relational operators and floating point comparisons 
-=========================================================================
+======================================================
 - Comparison computations with floating points cannnot trusted, especially when the values being compared are calculated and almost
   identical
 ```cpp
@@ -34,7 +34,7 @@
 ```
 
 exponent operator
------------------------------------------------
+-----------------
 exponent is done in cpp with the `std::pow(base, exponent)` function in the `<cmath>` header,
 due to the rounding error nature of floats `std::pow` is not usually accurate even when passing integers in as arguments.
 To fix this is better you use and implement your own function.
@@ -140,7 +140,7 @@ constexpr std::int64_t powint_safe(std::int64_t base, int exp)
 ```
 
 commma operator
------------------------------------------------
+---------------
 the comma operators allows us to declare multiple expressions wherever a single statement is allowed. its evalauates the left operand
 then the right one and return the value of the right one to the statement that declared it.
 
@@ -157,7 +157,7 @@ Example:
 ```
 
 Comparing floating point numbers (advanced reading)
------------------------------------------------
+---------------------------------------------------
 Custom function where you define your absolute range itself (epsilon) and `Donald Knuth` algorithm (deals with relative epsilon)
 
 ```cpp
@@ -209,7 +209,7 @@ This is easily fixed by by implementing our on absolute function.
 
 
  Logical operators 
-=========================================================================
+====================
 | Operator                               | Symbol | Symbolic Name |
 |----------------------------------------|--------|---------------|
 | Logical NOT                            |   !    | not           |
@@ -218,7 +218,7 @@ This is easily fixed by by implementing our on absolute function.
 | Logical XOR (mimic for only booleans)  |   !=   |               |
 
 Short Circuit evaluation
------------------------------------------------
+------------------------
 When the AND logical operand is used: it evaluates the left operand first, if it evaluates to `true` the next operand is then evaluated to
 get the resultant of the boolean operation. if the the left operand evaluating to `true` is not the case, the whole and operation short-circuits
 and returns `false`, without even evaluating the right operand.
@@ -236,7 +236,7 @@ evaluating the right operand (incrementing the y object), so in this case, becau
 operand is never evaluated (which might be something the programmer has envisioned must happen). so keep this in mind felix.
 
 Logical XOR (!=)
------------------------------------------------
+----------------
 | x     | y     | result |
 | true  | true  | false  |
 | true  | false | true   |
@@ -259,7 +259,7 @@ this can alos be achieved useing the double negation operand to convert to bool`
 ```
 
 using the alternate name of logical operators
------------------------------------------------
+---------------------------------------------
 ```cpp
   std::cout << !a && (b || c);
   std::cout << not a and (b or c);

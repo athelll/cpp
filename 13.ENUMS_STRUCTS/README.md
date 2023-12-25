@@ -1,5 +1,5 @@
-=    Felix Okoronkwo Dec. 7 2023    =
-= Compound Types: Enums and Structs =
+Felix Okoronkwo Dec. 7 2023
+Compound Types: Enums and Structs
 
 Introduction to program-defined (user-defined) types
 ====================================================

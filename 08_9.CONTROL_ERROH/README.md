@@ -1,10 +1,10 @@
-= Control Flow and Error Handling =
-= Felix Okoronkwo, Nov 12, 2023 =
+ Control Flow and Error Handling 
+ Felix Okoronkwo, Nov 12, 2023 
 
  Control flow introduction 
-=========================================================================
+============================
 if statements
------------------------------------------------
+-------------
 syntax:
 ```cpp
 
@@ -33,7 +33,7 @@ else
 - prevent the dangling else problem and reduce ambiguity by using brackests when declaring if blocks.
 
 Null statements
------------------------------------------------
+---------------
 A null statement is an expression statement that consists of only a semicolon, they do nothing
 
 ```cpp
@@ -58,7 +58,7 @@ blowUpTheWorld();
 in this case the function `blowUpTheWorld()` is always executed. (probably not what the developer,or you even, wanted)
 
 Constexpr if statements
------------------------------------------------
+-----------------------
 its wasteful to compare constant variables with if/else statemnets because, dure to the fact their are constant they would always
 execute one side of the consitional and leave the other never to be executed.
 
@@ -87,7 +87,7 @@ int main()
 ```
 
 Switch statement basics
------------------------------------------------
+-----------------------
 sntax:
 ```cpp
 
@@ -118,14 +118,14 @@ int main()
 - sstes of statements in a witch stament should end ithe a `return` or break statement.
 
 Switch fallthrough and scoping
------------------------------------------------
+------------------------------
 the presence of another case label in a switch statemnt after a previous label was matches is not a terminating condition in a switc state-
 ment, swtch statemnst tend to execute other case labels that follow after a matched case label, this is known as Fallthrough.
 
 And this is why its advised to have a `return` or `break` statement in the body of all case labels in a switch statement.
 
 The Fallthrough attribute
------------------------------------------------
+-------------------------
 the fall through attrubute was intriduced in c++ to notify the compiler that the developer intend on allowing a fallthrough
 occur when used in conjuction with a `null statemnet` in a switch statement. this prevents the compiler from throwing any warnings and
 allows a fallthrough occur.
@@ -154,7 +154,7 @@ int main()
 ```
 
 Sequential case labels
------------------------------------------------
+----------------------
 when coparing the equality of a variable with differnt values this can be done with an OR if statemnt like so:
 ```cpp
   bool isVowel(char c)
@@ -188,7 +188,7 @@ compared with each of the switch labels, unlike the equality comparaison operato
 This is not considered fallthrough behavior, so use of comments or `[[fallthrough]]` is not needed here.
 
 Switch case scoping
------------------------------------------------
+-------------------
 the content of case labels are not implicitly scoped (like in the case of single statement if statements), so the contents of each labels
 belong to the scope of the main switch statement that they belong to.
 
@@ -205,7 +205,7 @@ switch (1)
 ```
 
 Variable declaration and initialization inside case statements
------------------------------------------------
+--------------------------------------------------------------
 you can declare or define a variable in a switch statement but not initialize, whether before or after case labels.
 
 ```cpp
@@ -230,7 +230,7 @@ switch (1)
 ```
 
 Reasons why initiaization is illegal in switch statements:
------------------------------------------------
+----------------------------------------------------------
 due to the fact that variables initilization occur at runtime and the value to be initilized with must be known and switch statments start
 execution from the first matched case (making it that whatever in the previous case labels are not executed) imagine that initilization
 was declared in one of those previous label cases, initialization will not occur. Because of this c++ only allows initialization occur in
@@ -257,7 +257,7 @@ switch (1)
 
 
  Goto statements 
-=========================================================================
+==================
 goto statements are uncoditional jumps that move the execution to another part in the code. It's unconditional because it will always
 execute when called.
 
@@ -285,12 +285,12 @@ tryAgain:          // this is a statement label that can be gone to
 
 
  Introduction to loops and while statements 
-=========================================================================
+=============================================
 - Integral loop variables should be signed
 
 
  Do while statements 
-=========================================================================
+======================
 this are while statements in which the statements contained in them exexutes at least one and continues re-executing if the conditional (its evaluating)
 evaluates to true.
 
@@ -305,7 +305,7 @@ while loops are to be favoured over them if given an equal stance to be implemen
 
 
  For statements 
-=========================================================================
+=================
 syntax:
 ```cpp
 
@@ -327,7 +327,7 @@ for (;;)
 ```
 
 For loops with multiple counters
------------------------------------------------
+--------------------------------
 For loops also work with multiple counters.
 syntax:
 ```cpp
@@ -346,13 +346,13 @@ int main
   and use of the comma operator is considered an acceptable practice.
 
 Breaks and Continues
------------------------------------------------
+--------------------
 - Use break and continue when they simplify your loop logic.
 - Use early returns when they simplify your function’s logic.
 
 
  Halts (exiting your program early) 
-=========================================================================
+=====================================
 read [[www.learncpp.com/cpp-tutorial/halts-exiting-your-program-early/]]
 
 - `std::exit()`: makes sure your program terminates mormally (doesnt mean the program can't return an error code, or perfrom wrongly).
@@ -379,11 +379,11 @@ read [[www.learncpp.com/cpp-tutorial/halts-exiting-your-program-early/]]
 
 
  Introduction to testing your code 
-=========================================================================
+====================================
 Testing a small part of your code to ensure that unit of code is working is known as unit testing.
 
 Preserving your tests
------------------------------------------------
+---------------------
 when we write test and come to the conclusion that it was suffucent in testing what was to be tested. its ideal to preserve thoes
 test instead of wiping them off after they validate our code (in case of adding new features to our existing code and wanting to make
 sure no ripple effect that might break the code occured, this is why we preserve them). this can be done by movng the tests to a function.
@@ -422,9 +422,9 @@ int main()
 ```
 
  Handling Errors in c++ 
-=========================================================================
+=========================
 Fatal errors
------------------------------------------------
+------------
 if an error is so bad that the porgram cannot continye to runas long as this error has occured this is known as a fatal error or a non-recoverable error.
 IN such cases its best to just terminate the program, if your in main() you easily terminate using a return non-zero-code status but if not ( like you in some
 deep nested subfunction) a halt statement can be used. (such as `std::exit()`)
@@ -443,23 +443,23 @@ double doDiviison(int x, int y)
 ```
 
 Exceptions
------------------------------------------------
+----------
 will be covered later.
 
 
  std::cin and handling invalid input 
-=========================================================================
+======================================
 A program that handles error cases well is said to be robust.
 
 types of invalid text inputs
------------------------------------------------
+----------------------------
 - inout extraction succeeds but input is uselss to the prgram
 - input extraction succed but the user inputes additional data into the buffer
 - input extraction fails (inouttung 'q' into a numerical variable)
 - input extraction succeeds but the user overflows a numeric value.
 
 handling the above situations
------------------------------------------------
+-----------------------------
 1) write code that only runs with the needed input to be compared with to work: like using a switch statement if its a finite number if expected input to execute if
    theres a match between the label cases and the input.
 2) the `std::cin.ignore(characters_count_to_ignore, delimeter)` function is pretty useful to clear the buffer to ensure nothing is stored after using it.
@@ -549,7 +549,7 @@ double getDouble()
 
 
  Assert and static_assert 
-=========================================================================
+===========================
 preconditions - this are conditrions tat must be true before a computation can occur
 invariant     - this are condition that must be true while a specific computation occurs.
 postcondition - this are condition that must be true after a compution has ran.
@@ -557,7 +557,7 @@ postcondition - this are condition that must be true after a compution has ran.
 ultimately they all exist to ensure that the program executes correctly.
 
 Assertions
------------------------------------------------
+----------
 c++ offers a shortcut for performing if condition iuput assesments to ensure correct state of variables for a computation to execute.
 this is done using c++ `assertions`
 
@@ -565,7 +565,7 @@ An assertion is a boolean exoressions that will always be true unless theres a b
 if not the program is terminated (via  `std::abort()`) and an error message is printed with info about the termination and (possibly) its cause.
 
 runtime assertions
------------------------------------------------
+------------------
 the runtime assertions are implemented via the assert preprocessore macro in the `<cassert>` header
 
 ```cpp
@@ -609,7 +609,7 @@ and with that descriptive messages can be added to asserts.
 - use assertion to documanet cases that should be logically impossible
 
 NDEBUG
------------------------------------------------
+------
 using assertion come with a minute performance cost,  so assertions sould never be used in production code.
 the `NDEBUG` macro was implemented to disable assertions if defined. meaning that if assertions where used in your code they can be diabled
 by defining this macro.
@@ -619,7 +619,7 @@ by defining this macro.
   program abruptly shuts down.
 
 static_assert
------------------------------------------------
+-------------
 the `static_assert` is used to perform compile-time assertions meaning its shlould be used in compile time contexts. unlike that assert macro
 thats defined in the `<cassert>` header `static_assert` is a keyword so no header needs to be included.
 
@@ -638,7 +638,7 @@ notes about `static_assert`:
 
 
  Introduction to random number generation 
-=========================================================================
+===========================================
 An algorthim is a finite sequence of instructions that can be used to solve a problem or complete a task.
 
 an algorithm is known to be `stateful` if it retains some kind of information within succesive calls.
@@ -647,7 +647,7 @@ A `stateless` algorithm does not store any information as its being used (must b
 an algorithm is known to be determinstic if for a given input it would always produce he same output sequence.
 
 Pseudo-random number generators (PRNGs)
------------------------------------------------
+---------------------------------------
 a PRNGs is an algorithm that generates a sequence of numbers that mimics the sequence of randomness.
 
 simple PRNG algo implemetation:
@@ -685,7 +685,7 @@ most PRNGs that produce quality results are usually seeded with values of 16 bit
 the size of the seed can be samller than the state of the PRNGs if this happens the PRNGs is known to be `underseeded`.
 
 What makes a good PRNG?
------------------------------------------------
+-----------------------
 - the PRNGs shokd generate numbers with approx. almost the same probabilty. this is known as `distribution uniformity`
 - the method that the next number is generated in the sequence should not be predictable.
 - a good PRNG should have a good dimensional distrubution of numbers. meaning it should be able to generate odd, even, large, small etc. numbers at random.
@@ -693,7 +693,7 @@ What makes a good PRNG?
 - The PRNG should be efficient
 
 Randomization in C++
------------------------------------------------
+--------------------
 the randomization capabilities in c++ are acessed with the `<random>` header of the standard library, there are 6 PRNGs families
 available for use since c++20
 
@@ -708,7 +708,7 @@ if your writing an application where non-prefictability is required your better 
 2) The Chacha family for cryptographic (non-predictable) PRNGs.
 
 Mersenne twister
------------------------------------------------
+----------------
 it belongs to the `<random>` header and it consists of 2 types:
 1) mt19974      : generates 32 bits unsigned integers.
 2) mt19974_64   : generates 64 bits unsigned integers.
@@ -738,7 +738,7 @@ the `operator()` function returns the next pseudo randomly generated sequence of
 this random genreating types in the `<random>` header.
 
 adding uniform distibution limits to the mersenne twister
------------------------------------------------
+---------------------------------------------------------
 usually a 32 but mersenne twister will generate numbers from 0 to 4,294,967,295, but we dont always want numbers of that large of a range and sometimes
 requre a limit. this limit is added using a uniform distribution. PRNGs on theirn own cant add uniformly distibuted limits so their outputs are placed in functiona that can.
 
@@ -779,7 +779,7 @@ not actually need a random seeds to spawn differnt outputs what it needs precise
 2) or the systems random device (/dev/random on linux, at least i think thats a linux random device)
 
 Seeding with the system clock
------------------------------------------------
+-----------------------------
 the system clock can be used as changing seed whem instatiating a misernne twister, but the units of time measuremnet must be very small, messured in ticks;
 how this works is that some function in the `<chrono>` header retrieves the time exuded after the earliest time recorded. ticks are really small
 like in nano-seconds or milli-seconds: they are then used as seed to instantiate the PRNGs. the reason they are so small is to prevent being seeded with the same seed
@@ -818,11 +818,11 @@ but for programs that require high quality, independent results, this method of 
 any how ill just continue.
 
 Random numbers across multiple functions or files (Random.h)
------------------------------------------------
+------------------------------------------------------------
 this is done with namespaces and inline variables in the header file.
 read up the details heres ince the notes where lost: [[http://www.learncpp.com/cpp-tutorial/generating-random-numbers-using-mersenne-twister/#RandomH]]
 
-```cpp
+```cpp: random.h
 #ifndef RAND_H
 #define RAND_H
 
@@ -872,7 +872,7 @@ namespace Random
 ```
 
 ussage:
-```cpp
+```cpp: main.cpp
 #include "random.h"
 
 int main()

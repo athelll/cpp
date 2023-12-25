@@ -1,8 +1,8 @@
-= Scope, Duration, and Linkage =
-= Felix Okoronkwo Nov 6, 2023 =
+ Scope, Duration, and Linkage 
+ Felix Okoronkwo Nov 6, 2023 
 
  Compound statements (blocks) 
-=========================================================================
+===============================
 - A compound statement (also known as a block or block statement), is a group of zero or more statements that the compiler
   treats as if a single statement.
 - blocks can be nested
@@ -10,13 +10,13 @@
 - The C++ standard says that C++ compilers should support 256 levels of nesting (what the fuck!?)
 
  User-defined namespaces and the scope resolution operator 
-=========================================================================
+============================================================
 Beacuse the identifiers of objects can potentially collide with similar identifiers in the same scope, this leads to a
 linear increase in identifiers and an exponential increase in naming collisions, this is why namespaces are important.
 Because they solve this problem.
 
 Defining your own namespaces
------------------------------------------------
+----------------------------
 namsepaces created by we the developer are known as `user-defined namespaces` and they are accomplished with the `namespace` keyword.
 
 ```cpp
@@ -55,7 +55,7 @@ namespace Namespaceidentifier
 ```
 
 Accessing a namespace with the scope resolution operator (::)
------------------------------------------------
+-------------------------------------------------------------
 - The scope resoltion operator allows us to explicitly select what namespace wo want to access an object or function from
 - when the scope operator is used with no namespace identifier, the global namespace is used.
 
@@ -83,7 +83,7 @@ int main()
 ```
 
 Identifier resolution from within a namespace
------------------------------------------------
+---------------------------------------------
 if an identifer inside a namespace is used and no scope was declared: the namespace would first search for the identifier
 within itself, if not found, it searches the namespace it is contained in (usually the global namespace).
 
@@ -118,7 +118,7 @@ int main()
 ```
 
 Forward declaration of content in namespaces
------------------------------------------------
+--------------------------------------------
 - for function identifers inside a namespace, their forward declaration also, needs to be included in that namespace.
 
 add.h
@@ -164,7 +164,7 @@ int main()
 - extra identifiers can be added to a namespace with subsequent declarations.
 
 Multiple namespace blocks are allowed
------------------------------------------------
+-------------------------------------
 its legal to declare multilpe namespace blocks (wether across multiple files or multiple locations within the same file).
 All declaration within the namespace are considered part of the namespace.
 
@@ -173,7 +173,7 @@ All declaration within the namespace are considered part of the namespace.
 ```
 
 Nested namespaces and aliases
------------------------------------------------
+-----------------------------
 namespaces can be nested inside other namespaces and can be aliased, For example:
 
 ```cpp
@@ -210,38 +210,38 @@ namespaces cam also be nested with this syntax:
   (usually the namespace identifers migrated to and from, working with the identifier is a hassle because of its lengthy nature.)
 
 When you should use namespaces
------------------------------------------------
+------------------------------
 - When you write a library or code that you want to distribute to others, always place your code inside a namespace.
 - In applications, namespaces can be used to separate application-specific code from code that might be reusable later
 
 
 Local variables
-=========================================================================
+================
 nothing much here, they are block scope limited and have no linkage, meaning they must be unique in any scope they
 are spawned into.
 
 
  Global Variables 
-=========================================================================
+===================
 They are declared outside function bodies.
 
 - Globale varibales have `file scope`, meaning they can be used wny where in the file they are declared and goes out of scope
   at the end of the file
 
 Global variables have static duration
------------------------------------------------
+-------------------------------------
 they are created when the program start and are destroyed when the program ends, this is known as *static Duration*
 
 Naming Global variables
------------------------------------------------
+-----------------------
 By convention some developers prefix non const global variables with "g" or "g_" to declare that they are global.
 
 Global variable initialization
------------------------------------------------
+------------------------------
 unlike local varables which are unitialized by default, statc variables (like global variables) are zero initialized by default.
 
 Constant global variables
------------------------------------------------
+-------------------------
 Just like local varables, global variables can be constant. As with all constants global varables must be initilazed.
 
 ```cpp
@@ -260,7 +260,7 @@ constexpr g_w { 2 };      // valid
 
 
  Variable shadowing (name hiding) 
-=========================================================================
+===================================
 Read that shit yourself: [[www.learncpp.com/cpp-tutorial/variable-shadowing-name-hiding]]
 
 NOTE:
@@ -276,7 +276,7 @@ NOTE:
 
 
  Internal linkage 
-=========================================================================
+===================
 Global functions and function identifiers can either have internal or external linkages.
 Internal linkages would be discuseed in this section.
 
@@ -284,7 +284,7 @@ An identifier with an internal linkafge can be seen and used in a single transla
 by other translation units because it has no linkage (not exposed to the linker).
 
 Global variables with internal linkage
------------------------------------------------
+--------------------------------------
 const and constexpr variables implicitly posess internal linkage. but that no the case for non-cont global variables.
 to make a non-const global variables internally linked, the `static` keyword is used.
 
@@ -307,7 +307,7 @@ int main()
   commoonly used specifiers include are `static`, `extern` and `mutable`.
 
 Functions with internal linkage
------------------------------------------------
+-------------------------------
 Beacuse linkage is a property of identifiers not variables, function identifiers also posess linkage property.
 Function by defalut posess `external linkage`. and can be set to `internal linkage` using the `static` keyword.
 
@@ -350,12 +350,12 @@ check the section in the link with the same name as this section.
 
 
  External linkage and variable forward declarations 
-=========================================================================
+=====================================================
 An identifer with external linkage can be seen and used both in the file where it was declared and in other code files,
 via forward declaration. identifers with external linkages are truly global and can be used anywhere in a program.
 
 Functions have external linkage by default
------------------------------------------------
+------------------------------------------
 In order to call a function decfined in another file you must place a `forward declaration` for the function in the file
 you wish to call the function. the forward declaration tells the compiler about the existence of the function so the linker
 can link and execute the function with subsequent calls of the function in the file.
@@ -364,7 +364,7 @@ if the function to be called, which resides in another file, was internally link
 definations when the function is called and this would result to a linker error.
 
 Global variabes with external linkage
------------------------------------------------
+-------------------------------------
 Non-const global variables are externally linked by default (meaning they are external adn can be used any where in the codebase),
 but const global variabla are not and can be made external using the `extern` keyword.
 
@@ -376,7 +376,7 @@ extern constexpr int g_z { 7 };   // extern makes constexpr globals external. th
 ```
 
 Variable forward declarations via the extern keyword
------------------------------------------------
+----------------------------------------------------
 To actually use an external global variable defined in another file, a forward declaration must be declared
 (just like with functions). for vairables forward declaraion is done `using the extern keyword with no initialization value`.
 
@@ -429,7 +429,7 @@ extern const g_y;         // forward declaration (not initialized with extern).
 
 
  Why (non-const) global variables are evil 
-=========================================================================
+============================================
 read: [[/www.learncpp.com/cpp-tutorial/why-non-const-global-variables-are-evil]]
 
 - Use local variables instead of global variables whenever possible.
@@ -438,11 +438,11 @@ read: [[/www.learncpp.com/cpp-tutorial/why-non-const-global-variables-are-evil]]
   whenever possible.
 
 So what are very good reasons to use non-const global variables?
------------------------------------------------
+----------------------------------------------------------------
 read the section: [[www.learncpp.com/cpp-tutorial/why-non-const-global-variables-are-evil]]
 
 Protecting yourself from global destruction
------------------------------------------------
+-------------------------------------------
 read the section: [[www.learncpp.com/cpp-tutorial/why-non-const-global-variables-are-evil]]
 
 non const variables are dangerous because they can be cahnaged any where in the program without the developer  being aware
@@ -497,7 +497,7 @@ the above aproach is more modular and reusable, because we can calculate the sam
 gravitaional acceleration constant.
 
 Best Practices
------------------------------------------------
+--------------
 1) instead of this :
 ```cpp
 constexpr double gravity { 9.8 };
@@ -551,9 +551,9 @@ double getGravity()                            // has external linkage and acts 
 
 
  Sharing global constants across multiple files (using inline variables) 
-=========================================================================
+==========================================================================
 Global constants as internal variables
------------------------------------------------
+--------------------------------------
 inside a header file create a header file in the header file, create an namespace and include the constants  in the namespace,
 make sure te varibles are `constexpr`.
 
@@ -576,7 +576,7 @@ due tto the fact that constexpr variables are internally linked, each file scope
 of the constants that do not depend on eachother dure to no linkage.
 
 Global constants as external variables
------------------------------------------------
+--------------------------------------
 While the above approach is simple, it offers an issue, due to all the constants being independennt of each other (beacuse internally linked)
 and are duplicated with every header include to be used only in thier file scope, ths leads to a lot of duplication of
 constant objects that hold the same value. which can lead to lengthy build times if to be recompiled for some value change and if the
@@ -631,7 +631,7 @@ at run-time to execute the function, so in the file they are defined the operate
 runtime and  because of this they cannot be used in another file where compile-time variable is needed, like in `constexprs`.
 
 Global constants as inline variables C++17
------------------------------------------------
+------------------------------------------
 The inline variables solves the problems of the above fore-mention approaches. since the term inline has evolved in c++ to mean
 "multiple defination are allowed", but doesnt violate the ODR rule, becuase inlines operates as a substitution paradigm in c++.
 
@@ -666,7 +666,7 @@ we can include the header in whatever file we might need them in but this variba
 
 
  Static local variables 
-=========================================================================
+=========================
 The `static` keyword on a local variable is used to change the variables duration from `automatic` to `static`: therefore the variable
 exists throughout the programs lifespan adn is destroyes at the end of the program.
 
@@ -699,12 +699,12 @@ int main()
 - Avoid static local variables unless the variable never needs to be reset.
 
  Using declarations and using directives 
-=========================================================================
+==========================================
 A qualified name is a name that includes an associated scope
 An unqualified name is a name that does not include a scoping qualifier
 
 Using-declarations
------------------------------------------------
+------------------
 the using declaration alows us to use an unqualified name(with no scope) as an alias to a qualified name.
 it helps to reduce repitition in code of the namespace scope an object belongs to, when trying to access the object.
 
@@ -722,7 +722,7 @@ int main()
   (when used inside a function).
 
 Using-directives
------------------------------------------------
+----------------
 a using directive imports all names from a namespace into the scope the using directive was declared.
 ```cpp
 #include <ipstream>
@@ -737,7 +737,7 @@ int main()
 ```
 
 Problems with using-directives (a.k.a. why you should avoid “using namespace std;”)
------------------------------------------------
+-----------------------------------------------------------------------------------
 due to the fact that using directives import all names from a namespace including names youll likely nevver use, the
 probabilty of a naming collison occuring skyrockets (especially if you import the std namespace).
 
@@ -799,11 +799,11 @@ would have pinpointed which function we wanted to call.
 - Finally, the lack of explicit scope prefixes make it harder for a reader to tell what functions are part of a library and what’s part of your program.
 
 The scope of using-declarations and using-directives
------------------------------------------------
+----------------------------------------------------
 they are blocked scoped, its imported names exist in the scope of the block they are called and expired as we leave that block.
 
 Cancelling or replacing a using-statement
------------------------------------------------
+-----------------------------------------
 one definde cant be canclelled or replaced but its scipe can be limited with blocks.
 
 ```cpp
@@ -829,7 +829,7 @@ Of course, all of this headache can be avoided by explicitly using the scope res
 - Prefer explicit namespaces over using-statements. Avoid using-directives whenever possible. Using-declarations are okay to use inside blocks.
 
 Unnamed and inline namespaces
------------------------------------------------
+-----------------------------
 unamed namespaces or anonymous namespaces are namespaces declared without a name, they are use to grant identifiers internal linkage,
 just like he static keyword, and can be called without the scope operator.
 
@@ -854,7 +854,7 @@ it is usually used when we have alot of identifiers we want internally linked. i
 unamed namespaces are accessible from their parent scope.
 
 Inline namespaces
------------------------------------------------
+-----------------
 inline namespaces are usually for version controlling and adding new functionality without affecting backwards compatibility by
 making old functions obselete (by reformatting them). They dont affect linkage.
 
@@ -898,6 +898,6 @@ which can share the same identifier with identifiers in the legacy codebase  (ha
 the namespace marlked inlinr wpuld be the default namespace referred to when the scope operator is not used.
 
 Mixing inline and unnamed namespaces 
------------------------------------------------
+-------------------------------------
 either by nesting or full-out conjoined declaration: they are used to grant both internal linkage and version controlling.
 

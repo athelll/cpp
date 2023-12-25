@@ -1,8 +1,8 @@
-= Type Conversion and Function Overloading =
-= Nov 21st 2023, Felix Okoronkwo =
+ Type Conversion and Function Overloading 
+ Nov 21st 2023, Felix Okoronkwo 
 
 Implicit type conversion
-=========================================================================
+=========================
 the value of an objects is stored as sequences of bits:
 the integer `3` might be stored as integer as     : `0000 0000 0000 0000 0000 0000 0000 0011`
 and double `3.0` stored as                        : `0100 0000 0100 0000 0000 0000 0000 0000`
@@ -24,7 +24,7 @@ provided type doesnt not match but can be converted.
 
 
 Floating-point and integral promotion
-=========================================================================
+======================================
 the number of bits a data-type uses is known as its width. wider uses more bits, narrower: less.
 
 most datatypes widths are ledt for the compiler adn system architectire to decide thier sizes because they will most like agree on a width that is efficient
@@ -43,11 +43,11 @@ value preseving conversions are said to be `safe conversions`.
 because promotions are `safe`, the compiler will use it freely when needed.
 
 Numeric promotion categories
------------------------------------------------
+----------------------------
 they are divided into 2: `integral promotions` and `floating point promotions`.
 
 Floating point promotions
------------------------------------------------
+-------------------------
 suing the float promotion rules a float can be promoted to a double when needed.
 meaning that we can write a function that takes a double and call it with either a double or float.
 
@@ -67,7 +67,7 @@ int main()
 ```
 
 integral promotion
------------------------------------------------
+------------------
 this is more complicated than floating point promotion.
 
 1) signed char or signed short can be converted to int.
@@ -82,7 +82,7 @@ this is more complicated than floating point promotion.
 
 
  Numeric conversions 
-=========================================================================
+======================
 c++ supports another type of numeric type conversion and that is `numeric conversion`
 
 there are 5 basic types of numeric conversions:
@@ -98,7 +98,7 @@ note the the differnces bectween numeric pormotion and conversion is that:
 - conversion  : conversion form one datatype to another, regardless if some data has to be lost.
 
 Safe and potentially unsafe conversions
------------------------------------------------
+---------------------------------------
 1) Value-preserving conversions are safe numeric conversions where the destination type can precisely represent all the values in the source type.
 2) Reinterpretive conversions are potentially unsafe numeric conversions where the result may be outside the range of the source type.
    Signed/unsigned conversions fall into this category.
@@ -148,12 +148,12 @@ The following conversions are defined to be narrowing:
 - If you need to perform a narrowing conversion, use static_cast to convert it into an explicit conversion.
 
 Brace initialization disallows narrowing conversions
------------------------------------------------
+----------------------------------------------------
 Narrowing conversion is not allowed in brace initialization: this is why its the most preferred meothod of initialization (this constraint promotes writing safer code).
 if it needs to be done the `static_cast` keyword should be used to convert to the correct type.
 
 Some constexpr conversions aren’t considered narrowing
------------------------------------------------
+------------------------------------------------------
 this is because constepxr values are evaluated at compile time and replaces contexts that depend on that constexpr with the constexpr evaluation, which is not necessarily
 type narrowing except the evaluation is a type that the destination datatype cannot fully represent. (Not even sure about this logic but this is what i understand so far)
 
@@ -162,7 +162,7 @@ List initialization with constexpr initializers
 read this section.
 
  Arithmetic conversions 
-=========================================================================
+=========================
 read here: [[www.learncpp.com/cpp-tutorial/arithmetic-conversions]] not worth noting down.
 
 NOte:
@@ -170,7 +170,7 @@ NOte:
 
 
 Signed and unsigned issues
------------------------------------------------
+--------------------------
 if we examine this code:
 ```cpp
 #include <iostream>
@@ -195,7 +195,7 @@ this behavour of unsigned int and signed ints in calaculations can lead to unexp
 and this is why we should avoid using signed and unsigned int with an operator that requires the operand to be of the same type.
 
 Explicit type conversion (casting) and static_cast
------------------------------------------------
+--------------------------------------------------
 Type casting: C++ supports 5 different types of casts:
 1) C-style casts            (very powerful should be avoided in c++)
 2) static casts             (less powerful but safe, perfoms compile-time type checking to allow valid conversions: should always be favoured)
@@ -207,7 +207,7 @@ read this: [[www.learncpp.com/cpp-tutorial/explicit-type-conversion-casting-and-
 
 
  Typedefs and type aliases 
-=========================================================================
+============================
 in C++ the `using` keyword is what is use to create type aliases for an existing data-type:
 ```cpp
 using Distance = double;
@@ -216,21 +216,21 @@ Distance milesToDestination{ 3.4 };
 ```
 
 naming type aliases
------------------------------------------------
+-------------------
 start them with capital letters.
 
 Type aliases are not distinct types
------------------------------------------------
+-----------------------------------
 they do not create distinct new types they only create a new idenitifier that can be used to refer to an existing datatype.
 
 type aliases are not type safe.
 
 The scope of a type alias
------------------------------------------------
+-------------------------
 beacuse type aliases are hust identifiers they follow the same scoping principles with normal variable identifiers.
 
 Typedefs
------------------------------------------------
+--------
 an older way for type aliases inherited from C
 
 ```cpp
@@ -248,7 +248,7 @@ using someFcn = int(*) (double, char);
 ```
 
 Using type aliases for platform independent coding
------------------------------------------------
+--------------------------------------------------
 on of the primary use is to hide platform specific details. on some platforms int is 2 bytes and some 4 bytes, so we use type aliases
 to create adjusted aliases for types to enable writing plarform specific and non-dangerous code.
 
@@ -283,7 +283,7 @@ this is because `int8_t` is likely a tyodef for `signed char`
 
 
 Benefits of useing a type alias
------------------------------------------------
+-------------------------------
 1) Using type aliases to make complex types easier to read
 2) Using type aliases to document the meaning of a value
 3) Using type aliases for easier code maintenance: allowing you to change the underlying type of an object without having to update
@@ -291,13 +291,13 @@ Benefits of useing a type alias
 
 
 Downsides of type aliases
------------------------------------------------
+-------------------------
 it introduces new ideniftiers that make theyr original underlying types hard to figure out. we should use type aliases judicously: when they provide
 clear benefits of code readablity and maintainance.
 
 
  Type deduction for objects using the auto keyword 
-=========================================================================
+====================================================
 int this code below there is a present redundancy lurking:
 ```cpp
 double d{ 5.0 };
@@ -308,7 +308,7 @@ because we want the variable and the initializer to have the same type we are pr
 thay is the redundancy.
 
 Type deduction for initialized variables
------------------------------------------------
+----------------------------------------
 `type deduction` ot `type infernece` is a feature that allows the compiler to deduce the type of an object from the the objects initializer's type.
 to use tyoe deduction we ise the `auto` keyword.
 ```cpp
@@ -329,7 +329,7 @@ auto y{ };          // also cannot be inferred.
 ```
 
 Type deduction drops const / constexpr qualifiers
------------------------------------------------
+-------------------------------------------------
 ```cpp
 int main()
 {
@@ -349,7 +349,7 @@ int main()
 ```
 
 Type deduction for string literals
------------------------------------------------
+----------------------------------
 by default they are duduced as type `(const *char)`.
 
 if you want the auto keyworded string literal initialized object to have a type: `std::string` or `std:string_view` you'll need to impose a literal suffix.
@@ -374,7 +374,7 @@ auto s2 { getString() };        // good: no conversion required
 
 
  Type deduction for functions 
-=========================================================================
+===============================
 - the auto keyword in functions enable the function return the evaluated type of the return statement.
 - all the return statemenst inf the function should all evaluate to the same type ot the compiler throws an error.
 - aany functions that use the auto keyword must be fully defined before where they are needed in the file scope to be used (any forward declaration will not suffice):
@@ -399,7 +399,7 @@ error message:
 - Favor explicit return types over function return type deduction for normal functions.
 
 Trailing return type syntax
------------------------------------------------
+---------------------------
 it can be used to define function with `trailing return syntax`. where the return type is specified after te rest of the function prototype.
 ```cpp
 auto add(int x, int y) -> int
@@ -421,7 +421,7 @@ Note:
 
 
  Introduction to function overloading 
-=========================================================================
+=======================================
 function overloading allows to create to functions with same identifiers but with differnt parameter types in the case we want the a specific function
 to work or more than one type.
 Functions can be overloaded so long as each overloaded function can be differentiated by the compiler.
@@ -449,16 +449,16 @@ int main()
 ```
 
 Making it compile
------------------------------------------------
+-----------------
 what need to be true for a program with overloaded functio to compile:
 1) Each overloaded function has to be differentiated from the others, will be discussed in-depth later.
 2) Each call to an overloaded function has to resolve to an overloaded function, will be discussed in-depth later.
 
 
  Function overload differentiation 
-=========================================================================
+====================================
 How overloaded functions are differentiated
------------------------------------------------
+-------------------------------------------
 | Function property    | Used for differentiation |                                            Notes                                             |
 |:--------------------:|:------------------------:|:--------------------------------------------------------------------------------------------:|
 | Number of parameters | yes                      |                                                                                              |
@@ -480,14 +480,14 @@ the overloaded function might resolve successfully without throwing a compile er
 - Matches made by applying numeric promotions take precedence over any matches made by applying numeric conversions.
 
 Resolving ambiguous matches
------------------------------------------------
+---------------------------
 1) Often, the best way is simply to define a new overloaded function that takes parameters of exactly the type you are trying to call the function with.
 2) explicitly cast the ambiguous argument(s) to match the type of the function you want to call.
 3) If your argument is a literal, you can use the literal suffix to ensure your literal is interpreted as the correct type
 
 
  Deleting functions 
-=========================================================================
+=====================
 in some cases its possible to write functions that do not behave as desired when certain values are given as arguments.
 
 in those cases we can use the `= delete` operator to halt the program if those functions are used with those certain argumens:
@@ -518,7 +518,7 @@ int main()
 
 
  Default arguments 
-=========================================================================
+====================
 - this used to give functions a default preset of paramter value or values.
 - it only done with copy initialization syntax `int x = 9`, and not brace or list inititilizations (wont work)
 - it should be defined in header files
@@ -553,7 +553,7 @@ void mod(int a, double z=3.091);
   put the default argument in the function definition.
 
 Default arguments and function overloading
------------------------------------------------
+------------------------------------------
 defualt argumented functions can be overloaded:
 ```cpp
 
@@ -575,7 +575,7 @@ int main()
 
 
  Function templates 
-=========================================================================
+=====================
 function templates allow us to write functions that can be used with one than more types.
 it allows us to write fuctiosnthat its type is nit known until its called.
 
@@ -589,7 +589,7 @@ we use placeholder types for any paramter type return type or types used in the 
 
 
 decalraing function templates
------------------------------------------------
+-----------------------------
 in this ill be writing a function template for a max function:
 
 1) first we covert the return tyoes and variable types of the function into the placaholder type in thus case its T:
@@ -617,9 +617,9 @@ analyzing step 2:
 
 
  Function template instantiation 
-=========================================================================
+==================================
 Using a function template
------------------------------------------------
+-------------------------
 function templates are not actually functions they have only one job: to generate functions (that are to be compiled)
 
 with this function template:
@@ -642,7 +642,7 @@ max<int>(2, 1);           // this statement yields a function template instantia
 ```
 
 Process of function instantiation from templates
------------------------------------------------
+------------------------------------------------
 initaial code:
 ```cpp
 #include <iostream>
@@ -696,7 +696,7 @@ int main()
 so any call with to the template function will call the matching generated functions.
 
 Template argument deduction
------------------------------------------------
+---------------------------
 while using template functions we dont have explicitly state the type we intend to generate to use, THis is due to templates possessing a feature
 known as `template argument deduction`.
 
@@ -746,7 +746,7 @@ Z someFcn(Z, double)
 ```
 
 Instantiated functions may not always compile
------------------------------------------------
+---------------------------------------------
 if an instatiated function spawned from a template function is used with the wrong paraamter types or used in ways that its doesnt make sense semantically
 it would likely not compile or lead to UB.
 
@@ -784,7 +784,7 @@ std::string plusOne<std::string>(std::string y)
 ```
 
 Using function templates in multiple files
------------------------------------------------
+------------------------------------------
 function templates cannot be used in another file as lone as they files translation unit cannot see the full declaration of the function template.
 THis can be resolved by defining the function template in header files and including them where needed.
 
@@ -819,7 +819,7 @@ int main()
 ```
 
 why function templates do not violate ODR
------------------------------------------------
+-----------------------------------------
 fucntion templates generate function instances in file scopes they are included in and called into. but they fo not violate ODR because the generated
 instances for the translation unit of every file scope they were called and needed in are all inline.
 
@@ -827,7 +827,7 @@ so they all refer to one defination as inline objects do. Making it full proof f
 
 
  Non-type template parameters 
-=========================================================================
+===============================
 a non type template parameter are template parameters with a fixed type that serves as a placeholder for a constexpr value passed in as a template argument.
 
 a non type template parameter can be any of the following types:
@@ -844,7 +844,7 @@ an example of non-type template can be seen with the `std::bitset` object. we us
 
 
 Defining our own non-type template parameters
------------------------------------------------
+---------------------------------------------
 heres an example of a function that uses a non type template paramter:
 ```cpp
 #include <iostream>
@@ -874,7 +874,7 @@ conventions:
 - just as `T` is used as the name for type template parameters use `N` as the name for non-type parameters.
 
 What are non-type template parameters useful for?
------------------------------------------------
+-------------------------------------------------
 As of c++20 function parameters cannot be constexpr. this is true for normal function too.
 
 non-type template functiion can be used to sneakishly place constexpr values as arguments in functions. so they can be used in contexts that require constant expressions.
@@ -943,7 +943,7 @@ NOte:
   4) and so on.
 
 Type deduction for non-type template parameters using auto
------------------------------------------------
+----------------------------------------------------------
 as of C++17, non-type template parameters may use auto to have the compiler deduce the non-type template parameter from the template argument:
 ```cpp
 #include <iostream>
@@ -956,5 +956,5 @@ void print()
 ```
 
  EEENNNNNNNNNNNNNNNNNNNNNNNNNDD! 
-=========================================================================
+==================================
 

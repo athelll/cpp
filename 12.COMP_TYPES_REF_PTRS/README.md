@@ -68,7 +68,7 @@ in c++11, three additional value categories where added:
 this was all to support a new feature called `move semantics`.
 
 Lvalue and rvalue expressions
------------------------------------------------
+-----------------------------
 lvalues
 -------
 an lvalue (or `left value` or `locator value`) is a value that evaluates to an identifiable object, function or bitfield.
