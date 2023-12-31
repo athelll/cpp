@@ -540,3 +540,454 @@ things to note about the above snippet:
 
 Static member variables
 =======================
+static nmember variables are declared using the static keyword. they are shared by all objects of a class.
+```cpp
+#include <iostream>
+
+struct Something
+{
+  static int value;
+};
+
+int Something::value { 1 };
+
+int main()
+{
+  Something first {};
+  Something second {};
+
+  first.value = 2;
+
+  std::cout << first.value << '\n';
+  std::cout << second.value << '\n';
+
+  return 0;
+}
+```
+
+this results to both the first and second `Something` objects having the same value: 2.
+
+Static members are not associated with class objects
+----------------------------------------------------
+they are not associated with class objects, they are just basically scoped global variables to be accessed using the class identifier as its namespace.
+they exist even if no object is instantaiated: this makes sense since because they have static duration being `static` and all.
+
+Defining and initializing static member variables
+-------------------------------------------------
+when we declare static member variables ina class its act like somewhat of a forward declaration, the compiler doesnt allocate memory for it yet it just becomes aware of its existence.
+becuase `static member varibales` are essentilly global variables, you must explicitly define (and optionally initialize) the static member outside the class. in the global scope.
+
+in the example code snippet above we did this via this line:
+```cpp
+int Something::value { 1 };               // defines the static member variable.
+```
+the above lines serves two functions: instantiates the static member variable (just like a global variable) then initializes it. if left unitialized the static member variables
+are zero initialized by default.
+
+Note
+----
+- static member variables are not subjected to access controls: you can define and initialize the value eben if its declared as private or protected in a class.
+- if the class is placed in a header file (eg `something.h`), its static member definations are usually placed in the associated code file for the class (eg `something.cpp`)
+- if the class is declared in a source file (`.cpp`) the static member variables is usually declared below it in the same file.
+- do not define static member variables in a header file (just as global varibles, if they are include more than once you can end up with multiple definations and a possible compile error.)
+
+Initialization of static member variables inside the class definition
+---------------------------------------------------------------------
+if a static member is a const integeral type: `char`, `bool`, `const enum` etc. the static variable can be initialized inside a class:
+```cpp
+class SomeShiz
+{
+public:
+  static const int s_value { 4 };             // a static const integral type can be defined and initialized directly.
+};
+```
+c++17 allows static member variables to be inline: they can be initialized inside class definations regardless whether they are constant or not:
+```cpp
+class Whatever
+{
+public:
+  static inline int s_value { 3 };
+};
+```
+this is the preferred method of declaring static member variables.
+
+because `constexpr` members are implicitly inline they can be used to declare static member variable without using the `inline` keyword.
+```cpp
+#include <iostream>
+
+class Whatever
+{
+public:
+  static constexpr int s_value { 4 };
+  static constexpr std::string_view s_string { "Hello" };
+};
+```
+
+best practice
+-------------
+make your static members `inline` or `constexpr` so they can be initialized in your class defination.
+
+An example of static member variables
+-------------------------------------
+we can use it to assign unique ids to every object spawned from the class.
+```cpp
+
+class Something
+{
+private:
+  static inline int m_idGenerator { 0 };
+  int m_id {};
+
+public:
+  Something() { m_id = ++m_idGenerator; }
+  int getId() const { return m_id; }
+};
+
+int main()
+{
+  Something first{};
+  Something second{};
+  Something third{};
+
+  std::cout << first.getID() << '\n';
+  std::cout << second.getID() << '\n';
+  std::cout << third.getID() << '\n';
+  return 0;
+}
+```
+
+
+Static member functions
+=======================
+member finctions can alos be made static the can be used as accessor for static member variables:
+```cpp
+class Something
+{
+private:
+  static inline int m_value { 0 };
+
+public:
+  static int getValue() { return m_value; }
+};
+
+int main()
+{
+  std::cout << Something::getValue() << '\n';
+}
+```
+since they are independent of the class they are declared in becasue of thier static nature they can be accessed without an instance of the class the belong to: just by using the class
+as a namespace to access it.
+
+Static member functions have no `*this` pointer
+---------------------------------------------
+- they are not attached to any object: they have no `this` pointer
+- static member function can access other static members( variables or functions) but not non-static members
+
+Another example
+---------------
+static member function can be defined outside the class declaration: this works the same way as normal member functions.
+```cpp
+#include <iostream>
+
+class IDGenerator
+{
+private:
+  static inline int s_nextId { 0 };
+
+public:
+  static int generateID();
+};
+
+int IDGenerator::generateID()
+{
+  return s_nextID++;
+}
+
+int main()
+{
+  for (int count{ 0 }; count <= 10; count++)
+    std::cout << IDGenerator::generateID() << '\n';
+
+  return 0;
+}
+```
+this works as one should expect.
+
+A word of warning about classes with all static members
+-------------------------------------------------------
+pure static classes are called monostates: they can be useul but come with downsides.
+wo read this stuff at the site.
+
+Pure static classes vs namespaces
+----------------------------------
+they are generally the same just classes posses access controls which namespaces do not.
+
+C++ does not support static constructors
+----------------------------------------
+yup: but if you can directly initialize your members no constructor should be needed. thats why its recommended to qualify static member variables as `inline` or `constexpr`.
+```cpp
+#include <array>
+#include <iostream>
+
+struct myClass
+{
+  static inline std::array s_mychars { 'a', 'e', 'i', 'o', 'u' };
+};
+
+int main()
+{
+  std::cout << MyClass::s_mychars[3];
+}
+```
+
+if initializing your static member variable requires executing some code there are many obtuse way of achieving this: one way that works for all variable members (not only static) is to usea function
+to create an object fill it with data and return it to the caller:
+```cpp
+#include <array>
+#include <iostream>
+
+class MyClass
+{
+private:
+  static std::array<char, 5> generate()
+  {
+    std::array<char, 5> arr;
+    arr[0] = 'a';
+    arr[1] = 'e';
+    arr[2] = 'i';
+    arr[3] = 'o';
+    arr[4] = 'u';
+
+    return arr;
+  }
+
+public:
+  static inline std::array s_myArray { generate() };
+};
+
+int main()
+{
+  std::cout << MyClass::s_myArray[2] << '\n';
+}
+```
+
+
+ Friend non-member functions
+=============================
+in cases where we want to give some sort of access to the private and protected members of a class to an outsider for some reasons, `friendship` is a nice solution to this
+problem.
+
+Friendship is magic
+-------------------
+when we declare a function (member or non member) or class a `friend` of another class the class being befriended has granted access to its private and protected members to its friend.
+full access to be precise. friendship is always granted by the class to be accessed not the class that desires the access (that makes sense.)
+
+for example if a display class was made the friend of a storage class the display class will be able to access members of the storage class to effectively display the storage
+class mechanisms while remaining structurally seperate. `freindship is not affected by access controls.`
+
+Friend non-member functions
+---------------------------
+an example:
+```cpp
+#include <iostream>
+
+class Accumulator
+{
+private:
+  int m_value {};
+
+public:
+  int add ( int value ) { m_value += value; }
+  friend void print ( Accumulator& accumulator );
+};
+
+void print ( Accumulator& accumulator );
+{
+  std::cout << accumulator.m_value << '\n';         // because print is a friend is can access the private members of accumulator.
+}
+```
+
+Defining a friend non-member inside a class
+-------------------------------------------
+friend non-member functions can also be declared inside a classes declaration using the `friend` keyword. they have no `*this` pointer and are treated as if they are
+declared outside the class defination.
+```cpp
+#include <iostream>
+
+class Accumulator
+{
+private:
+  int m_value {};
+
+public:
+  int add ( int value ) { m_value += value; }
+  friend void print ( const Accumulator& accumulator )      // not a member function.
+  {
+    std::cout << accumulator.m_value;
+  };
+};
+```
+
+Syntactically preferring a friend non-member function
+-----------------------------------------------------
+sometimes declaring non-member functions can be preferred to that of member functions:
+```cpp
+#include <iostream>
+
+class Value
+{
+private:
+  int m_value {};
+
+public:
+  explicit Value(int v): m_value { 7 } { }
+  bool isEqualToMember ( const Value& v ) const ;
+  friend bool isEqualToNonMember ( const Value& u, const Value& v );
+};
+
+bool Value::isEqualToMemeber (const Value& v) const
+{
+  return m_value == v.m_value;
+}
+
+bool isEqualToNonMember (const Value& u, const Value& v)
+{
+  return u.m_value == v.m_value;
+}
+```
+so according to the shiz i just read the non-member functions  makes reading and knowning who owns what memeber easier and encourages a parallel modular structure
+which sounds like a good thing to have.
+
+Multiple friends
+----------------
+a function can be friends to more than one classes at the same time (like a `slut`)
+``` cpp
+#include <iostream>
+
+// forward declaration of Humidity class becuase
+// it would be referenced before its implemetation in the temperature class
+class Humidity;
+
+// class 1
+class Temperature
+{
+private:
+  int m_temp { 0 };
+
+public:
+  explicit Temperature (int temp) : m_temp { temp } {  }
+  friend printWeather (const Temperature& temp, const Humidity& humid);
+};
+
+// class 2
+class Humid
+{
+private:
+  int m_humid { 0 };
+
+public:
+  explicit Humidity (int humid) : m_humid { humid } {  }
+  friend printWeather (const Temperature& temp, const Humidity& humid);
+};
+
+void printWeather ( const Temperature& temp, const Humidity& humid )
+{
+  std::cout << "The temperature is " << temp.m_temp <<
+       " and the humidity is " << humid.m_humidity << '\n';
+}
+```
+Doesn’t friendship violate the principle of data hiding?
+--------------------------------------------------------
+1. A friend function should prefer to use the class interface over direct access whenever possible.
+2. Prefer to implement a function as a non-friend when possible and reasonable.
+
+
+Friend classes and friend member functions
+==========================================
+1. friendship is not reciprocal: just because you made a class your friend doesnt mean the class sees you as a friend, `damn`.
+2. class friendship is not transitive: just because A is a friend of B and B is a friend of C, that doesnt mean A is a friend of C.
+3. friendship is also not inherited: if A makes B a friend, classes derived from B do not implicitly become friends with A.
+
+Friend member functions
+-----------------------
+instead of making an entire class a friend. we can make a single member function a friend. this is done similarly to making non-member function a friend, excpet the
+name of the member function is used instead.
+
+this can be done by trying something like this:
+```cpp
+#include <iostream>
+
+class Display;    // forward declaration for display class
+
+class Storage
+{
+private:
+  int m_value {};
+  double d_value {};
+
+public:
+  Storage(int nValue, double dValue)
+    : m_nValue { nValue }, m_dValue { dValue }
+  {
+  }
+
+  friend void Display::displayStorage(const Storage& storage);                      // this results to an error.
+};
+
+class Display
+{
+  //...
+  void displayStorage(const Storage& storage)
+	{
+		if (m_displayIntFirst)
+			std::cout << storage.m_nValue << ' ' << storage.m_dValue << '\n';
+		else // display double first
+			std::cout << storage.m_dValue << ' ' << storage.m_nValue << '\n';
+	}
+  //...
+};
+```
+the above code will error out because in order to make a member function a friend the compiler has to see the full defination of the member function, a forward declaration
+will not suffice. since the storage class havent seen the defination of the class it errors out.
+this, fortunately, can be resolved by declaring and defining (or only just defining it) the class before the class that needs it member as a friend.
+and alos declaring a forward declaration of the storage class because it becomes referenced by the display class now and due to the current order its has no reference of the Storage class
+(this is fixed by the class forward declaration as stated before.)
+```cpp
+#include <iostream>
+
+class Storage;            // forward declaration become this class becoems referenced in the firstly declared class the display class.
+
+class Display
+{
+  //...
+  void displayStorage(const Storage& storage);                       // this is were the Storage class is referenced: will have errored out but luckily a forward declaration exists.
+  //...
+};
+
+class Storage
+{
+private:
+  int m_value {};
+  double d_value {};
+
+public:
+  Storage(int nValue, double dValue)
+    : m_nValue { nValue }, m_dValue { dValue }
+  {}
+
+  friend void Display::displayStorage(const Storage& storage);                      // this is legal: no error.
+};
+
+void Display::displayStorage(const Storage& storage)  // we define the member function outside its class becaue friend member functions need thier full declaration to be seen.
+{
+  if (m_displayIntFirst)
+    std::cout << storage.m_nValue << ' ' << storage.m_dValue << '\n';
+  else
+    std::cout << storage.m_dValue << ' ' << storage.m_nValue << '\n';
+}
+```
+
+
+Ref qualifiers
+==============
+read this part yourself
