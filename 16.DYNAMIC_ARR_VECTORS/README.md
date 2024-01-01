@@ -62,4 +62,41 @@ here we be talking of `std::vectors`.
 
 Introduction to std::vector
 ---------------------------
+the `std::vector` is one of the containers in c++ library that implements an array. it is declared in the vector header as a class template, with a template parameter
+that defines the type of its elements. therefore a `std::vector<int>` defines a container with elements of type `int`.
+```cpp
+#include <vector>
 
+int main()
+{
+  std::vector<int> empty {};
+}
+```
+
+Initializing a std::vector with a list of values
+------------------------------------------------
+most often we want to initialize our containerw with values: we can achieve this using list initialization and C++17 CTAD ( Class Template Argument Deduction )
+```cpp
+#include <vector>
+
+int main()
+{
+  std::vector<int> arr_int { 1, 2, 3, 4 ,5 };         // explicit delcaraion of a container of int elements
+  std::vetcor arr_char { 'a', 'b', 'c', 'f' };        // initializing and determining its type using CTAD.
+}
+```
+
+List constructors and initializer lists
+---------------------------------------
+containers have a special constructor known as `list constructor`. it allows us to construct an instance of the container using an initializers list.
+it does three things
+1. ensures container has enough space to hold all the initialization values
+2. sets the length of the container to the number of elements inputed
+3. initializes the elemenst in sequntial order as listed in the list initializer.
+
+Accessing array elements using the subscript operator (operator[])
+------------------------------------------------------------------
+just like in C: they are `zero based` tho.
+
+Subscript out of bounds
+-----------------------
