@@ -272,4 +272,183 @@ int main()
 
 Getting the length of a std::vector using std::ssize() C++20
 ------------------------------------------------------------
+it us a function that returns the length of a container as a large signed integeral type (usually `std::ptrdiff_t`), its usesd as a signed conterpart of `std::size_typr`
+if we want to uses this as a method for assigning the length of a container to an `int` we have some options:
 
+* first: using the `static_cast` to prevent narrow conversions:
+```cpp
+std::vecttor num { 1, 2, 3, 4 };
+int length { static_cast<int>( std::ssize(num) ) };
+```
+* or we can use the auto keyword to deduce the type of the length to be returned by the intgeral type:
+```cpp
+std::vecttor num { 1, 2, 3, 4 };
+auto length { std::ssize(num) };
+```
+
+Accessing array elements using operator[] does no bounds checking
+-----------------------------------------------------------------
+yeah it doesnt if indexing for an out of bound index, UB can occur.
+
+Accessing array elements using the at() member function does runtime bounds checking
+------------------------------------------------------------------------------------
+yeah if performs bpund checking at runtime so if an out of bound index is requested using the `at()` member function it halts the program at runtime.
+an exmaple:
+```cpp
+#include <iostream>
+#include <vector>
+
+int main()
+{
+    std::vector vec { 1,2 ,3, 4, 5 };
+    std::cout << vec.at(4);                                                 // this is fine. still in bound.
+    std::cout << vec.at(8);                                                 // terminates program at runtime: not in bounds.
+}   
+```
+when the `.at()` member function tries to acces an out of bound indec it throws an `std::out_of_range` error and terminates the program.
+becuae of its runtime evaluation nature its slower than `operator[]` indexing but more safer.
+
+Indexing std::vector with a constexpr signed int
+------------------------------------------------
+we can do this tp enable the compiler convert the constexpr signed int to a std::size_t withput it being a narrow conversion.
+an example:
+```cpp
+std::vector<int> num { 1, 2, 3, 4 };
+std::cout << num[2];
+
+constexpr int index { 3 };
+std::cout << num[ index ];      // not a narrow conversion.
+```
+dont get the use of this but okay.
+
+Indexing std::vector with a non-constexpr value
+-----------------------------------------------
+the subscripts used to index an array can be non const.
+an example:
+```cpp
+std::vector num { 1, 2, 3, 4 };
+std::size_t index { 2 };
+
+std::cout << num[index];                    // operator[] requires an index of type std::size_t so no narrow conversion required.
+```
+whn our subscripts are non-constexpr signed integer we run into some issues.
+an example:
+```cpp
+std::vector num { 1, 2, 4, 5 };
+int index { 3 };
+std::cout << num[index];                        // hers a problem occurs: narrow conversion (implicilty converted signed int to std::size_t).
+```
+this might raise some warnings (not errors) if warning flags where set, this can be quite annoying.
+we can prevent this by always:
+1. `static_cast`ing our subcripts when not of the right type which is `std::size_t`
+2. or just always using the `std::size_t` as the type of subsripts whenever.
+
+
+Passing and returning std::vector, and an introduction to move semantics
+========================================================================
+
+the `std::vector` element type is part of the type information of the object. so when we declare `std:vectors` as parameter ina function.
+we declare them with thier full template declaraion. amd becuase vectors can be quite expensive to copy we pass the as references.
+an example:
+```cpp
+#include <iostream>
+#include <vector>
+
+voud passByRef(std::vector<int>& arr)               // we must explicitly specify the <int>.
+{
+    std::cout << arr[0] << '\n';
+}
+
+int main()
+{
+    std::vector vec { 1, 2, 3, 4, 5 };
+    passByRef(vec);
+    retunr 0;
+}
+```
+Passing std::vector of different element types
+----------------------------------------------
+vbebcuae the passByRef function only takes in vectors of element type `int` we cannot pass in another vectors of a different element type.
+
+in c++17+ this can be bypassed tho using CTAD (class template argument deduction)
+an exmaple:
+```cpp
+#include <iostream>
+#include <vector>
+
+voud passByRef(const std::vector& arr)               // no need to specify the <int> to allow CTAD work.
+{
+    std::cout << arr[0] << '\n';
+}
+
+int main()
+{
+    std::vector prime { 1, 2, 3, 4, 5 };
+    passByRef(prime);                           //  CTAD uses its argument to infer that te vector should be of type std::vector<int>
+}
+```
+
+we can alos make the function a template function instead of reling on CTAD:
+an exmaple:
+```cpp
+#include <iostream>
+#include <vector>
+
+template <typename T>
+void passByRef(const std::vector<T>& arr)
+{
+    std::cout << array[0];
+}
+```
+
+Passing a std::vector using a generic template or abbreviated function template
+-------------------------------------------------------------------------------
+pass
+
+Asserting on array length
+-------------------------
+when we try acces an index thats out of bounds of a vector it leads to UB.
+so we can asser on the size first: if logically acceptable we can proceed.
+
+Returning a std::vector
+-----------------------
+when we need to pass in a vector into function we pass it as a cont reference just not to make a copy.
+but for some god dammed reason its okay to return it by value.
+
+Introduction to move semantics
+------------------------------
+when inaitializing or assigning a value to an object copies value from another object we say its operating with `copy semantics`
+sometimes when we intialize `some` objects with another objects of the same datatype instead of we accomplishing out goal with `copy semantics` the compiler performs
+`move semantics` instead.
+
+this is when instead of copying the data from an object to intialize another object, we move the data of the initializing object to the one to be initialized (`move semantics`)
+there are 2 criterias for this to occur:
+1. the datatype must support move semantics
+2. the object to be intialized must be initrialized with another object of the same datatype thats an `rvalue`.
+
+not many datatypes support, `std::vector` and `std::string` support move semantics tho.
+
+an example of move semantics in c++:
+```cpp
+#include <vector>
+
+std::vector generateVec()
+{
+    std::vector vec { 1, 2, 3, 4, 5 };
+    return vec;
+}
+
+int main()
+{
+    std::vector vec { generateVec() };          // here move semantics occur becuase firstly std::vector supports it and
+                                                // secondly its being intialized with an rvalue object returned by the generateVec() function.
+}
+```
+
+We can return move-capable types like std::vector by value
+----------------------------------------------------------
+Because of std::vector supports move semantics we can return by value without worrying about object duplication.
+making retunr by value extreemely inexpensive for this types.
+
+Arrays and loops
+================
