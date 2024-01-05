@@ -450,5 +450,167 @@ We can return move-capable types like std::vector by value
 Because of std::vector supports move semantics we can return by value without worrying about object duplication.
 making retunr by value extreemely inexpensive for this types.
 
+
 Arrays and loops
 ================
+an example:
+```cpp
+#include <iostream>
+#include <vector>
+
+int main()
+{
+    std::vector scores {23, 455, 65, 76, 23};
+    std::size_t length { std::size(scores) };
+
+    int average { 0 };
+    for (std::size_t index { 0 }; index < length; ++index)
+        average += scores[index];
+    average /= static_cast<int>( std::size(scores) );
+
+    std::cout << "average score is " << average << '\n';
+    return 0;
+}
+```
+accessing the elements of a container in some order is known as `traversal` or `iterating through`.
+
+Templates, arrays, and loops unlock scalability
+-----------------------------------------------
+an example:
+```cpp
+#include <iostream>
+#include <vector>
+
+template <typename T>
+T average(const std::vector<T>& array)
+{
+    std::size_t len { array.size() };
+
+    T average { 0 };
+    for (std::size_t index { 0 }; index < len; ++index)
+        average += array[index];
+    average /= static_cast<int>(len);
+
+    return average;
+}
+
+int main()
+{
+    std::vector class1 { 84, 92, 76, 81, 56 };
+    std::cout << "The class 1 average is: " << calculateAverage(class1) << '\n';
+
+    std::vector class2 { 93.2, 88.6, 64.2, 81.0 };
+    std::cout << "The class 2 average is: " << calculateAverage(class2) << '\n';
+
+    return 0;
+}
+```
+
+Arrays and off-by-one errors
+----------------------------
+fuck this shi
+
+
+Arrays, loops, and sign challenge solutions
+===========================================
+we all know that container subscript, index and length type are `std::size_t` which is an unsigned integeral.
+because of the unstable nature of unsigned types when interacting with negative values: this can pose some issues like so:
+```cpp
+#include <iostream>
+#include <vector>
+
+int main()
+{
+    std::vector vec { 1, 2, 3, 4, 5 };
+
+    for (std::size_t index { vec.size() -1 }; index >= 0; --index)
+        std::cout << vec[index] << ' ';
+}
+```
+firstly it iterates an prints the vector elements in reversal as expected then after (and at) the iteration where index becomes -1 undefined behaviour occurs.
+this is due to the bound wrapping action unsigneds take when interacting with negative values. because it bounds to some very large garbage value whenever
+`index` should be negative the loop never ends (due to its `index >= 0` condition) and prints garbage values infinitely until the program crashes.
+
+athough there are a some ways to fix this issue. using `signed` integral type can easily fix this but it itself has its own downsides.
+an example:
+```cpp
+#include <iostream>
+#include <vector>
+
+int main()
+{
+    std::vector vec { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+
+    for (int index {static_cast<int>( vec.size()-1 )}; index >= 0; --len)
+        std::cout << vec[static_cast<std::size_t>(index)] << ' ';
+}
+```
+in this snippet although its works the cluttering of code is crazy: which reduces readablity. although the cluttering is not that severe in this example it becomes
+really much in lerger code. so yeah `unsigned` compromises execution safety when interacting with negaative but `signed` creates a lot of clutter.
+so what can we do?
+
+Leave signed/unsigned conversion warnings off
+---------------------------------------------
+makes debuginng easier and prevents being drowned with a buttload of warnings.
+
+Using an unsigned loop variable
+-------------------------------
+soe developers prefere using this paradigm but we have to careful to preven running into signed/unisgned mismatches when doing so.
+
+1. using the `size_type` of conatiners (usually its just an alias of `std::size_t` which is just an unsigned long (long)) 
+    an example:
+    ```cpp
+    std::vector arr { 1, 2, 3, 4, 5 };
+
+    for (std:vector<int>)::size_type index { 0 }; index < arr.size(); ++arr)
+        std::cout << arr[index];
+
+    ```
+    however using `size_type` has some downsides: its nested so clutters code and when used in a function template, because it becomes a nested
+    dependent type (due to being used in a template function that takes in template parameter to genereta the the type of vector container thus making
+    it dependent) we have to prefix the `typename` keyword when declaring it. you have to use the prefix `typename` whenver declaring a dependent type
+    an example:
+    ```cpp
+    #include <iostream>
+    #include <vector>
+
+    template <typename T>
+    void printArray(std::vector<T>& arr)
+    {
+        for (typename std::vector<T>::size_type index { 0 }; index < arr.size(); ++index)
+            std::cout << arr[index];
+    }
+    
+    int main()
+    {
+        printArray( std::vector {1, 3, 4, 5, 6, 7} );
+    }
+    ```
+    any name that depends on a type containing a template paramater is called a `dependent name`.
+    and they must be prefixed with the `typename` keyword.
+    
+    sometimes soem developers use alias to make loops easier to read.
+    an example:
+    ```cpp
+    using arrayi = std::vector<int>;
+    for (array1::size_type index { 0 }; index < arr.size(); ++index)
+    ```
+
+    or we can also tell the compiler to return the tyoe of the container using the `decltype` keyword, whih returns the type of its parameter.
+    an example:
+    ```cpp
+    for (decltype(arr)::size_type index { 0 }; index < arr.size(); ++index)
+    ```
+    however if arr is a reference the above doesnt work so we have to remove the reference: and to do that we:
+    ```cpp
+    template <typename T>
+    void printArray(std::vector<int>& arr)
+    {
+        for ( typename std::remove_reference_t<decltype(arr)>::size_type index {0}; index < arr.size(); ++index )
+            std::cout << arr[index];
+    }
+    ```
+    undortunately this is neither concise or easy to remeber so most times programmers just use `std::size_t` becasue most of the times
+    containers `size_type` are usually aliases of `std::size_t`.
+
+2.
