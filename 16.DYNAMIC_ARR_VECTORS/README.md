@@ -555,7 +555,7 @@ makes debuginng easier and prevents being drowned with a buttload of warnings.
 
 Using an unsigned loop variable
 -------------------------------
-soe developers prefere using this paradigm but we have to careful to preven running into signed/unisgned mismatches when doing so.
+some developers prefer using this paradigm but we have to careful to prevent running into signed/unisgned mismatches when doing so.
 
 1. using the `size_type` of conatiners (usually its just an alias of `std::size_t` which is just an unsigned long (long)) 
     an example:
@@ -596,7 +596,7 @@ soe developers prefere using this paradigm but we have to careful to preven runn
     for (array1::size_type index { 0 }; index < arr.size(); ++index)
     ```
 
-    or we can also tell the compiler to return the tyoe of the container using the `decltype` keyword, whih returns the type of its parameter.
+2. We can also tell the compiler to return the type of the container using the `decltype` keyword, whih returns the type of its parameter.
     an example:
     ```cpp
     for (decltype(arr)::size_type index { 0 }; index < arr.size(); ++index)
@@ -613,4 +613,6 @@ soe developers prefere using this paradigm but we have to careful to preven runn
     undortunately this is neither concise or easy to remeber so most times programmers just use `std::size_t` becasue most of the times
     containers `size_type` are usually aliases of `std::size_t`.
 
-2.
+Using a signed loop variable
+----------------------------
+
