@@ -1176,8 +1176,8 @@ basically at a vectors initialization capacity and length are the same.
 when the vector gets expanded (via resizing and reallocation) the capacity and length, although incremented, resolve to be equal.
 but something specaial happens when a vector is shruken.
 
-refer to cpp file           : 
-and run executanles file    :
+refer to cpp file           :   [test_capacity_length_vector.cpp]( test_capacity_length_vector.cpp  )
+and run executanles file    :   [test_capacity_length_vector]( test_capacity_length_vector  )
 to notice the difference of them
 
 something to note (personal findings):
