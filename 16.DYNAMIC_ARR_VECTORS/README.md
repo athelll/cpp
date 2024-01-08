@@ -616,3 +616,615 @@ some developers prefer using this paradigm but we have to careful to prevent run
 Using a signed loop variable
 ----------------------------
 
+### What signed type should we use?
+
+1. with small arrays `int`
+2. with very larger arrays, or if wantung to be a bit defensive we use the strangely named `std::ptrdiff_t`. its a typedef of the positive counterpart
+    to `std::size_t`.
+3. becuase it has a wierd name long name, another approach is using an alias for it.
+    an example:
+    ```cpp
+    using Index = std::ptrdiff_t
+
+    for (Index index { 0 }; index < static_cast<Index>(arr.size()); ++index)
+    ```
+4. in cases where you can deuce the type of your loop variable from from the initializer, you can use the `auto` to have the compiler deduce the type.
+    ```cpp
+    for (auto index {static_cast<std::ptrdiff_t>( arr.size-1 )}; index >= 0; --index)
+    ```
+    in the c++23 the `Z` suffix was introduced as a literal definer for the signed counterpart of `std::size_t` (probably `std::ptrdiff_t`)
+    ```cpp
+    for (auto index {0Z}; index < static_cast<std::ptrdiff_t>(arr.size()); ++index)
+    ```
+
+### Getting the length of an array as a signed value
+
+1. using `static_cast` to cast the return of std::size() or .size() to a signed. 
+    an example:
+    ```cpp
+    #include <vector>
+    #include <iostream>
+
+    using Index = std::ptrdiff_t
+
+    int main()
+    {
+        std::vector arr { 1, 2, 3, 4, 5 };
+
+        for (auto index { 0Z }; index < static_cast<Index>(arr.size()-1); ++index)
+            std::cout << arr[static_cast<std::size_t>(index)] << ' ';
+    }
+    ```
+    this works well but the downside is how much it clutters code. one way to elimated ths is removing the length variable out of the
+    loop block
+    ```cpp
+    #include <iostream>
+    #include <vector>
+
+    using Index = std::ptrdiff_t
+
+    int main()
+    {
+        std::vector arr { 1, 2, 3, 4, 5 };
+
+        auto len { static_cast<Index>(arr.size) };
+        for (auto index { len-1 }; index >= 0; --index)
+            std::cout << arr[static_cast<std::size_t>>(index)] << ' ';
+    }
+    ```
+    more evidence that the designers of c++ want to push the paradigm of interacting with arrays and their indices using `signed` integrals
+    is the introduction of `std::ssize()` in C++20. the function retunrs the size of a container as a signed intgral (likely `std::ptrdiff_t`)
+    ```cpp
+    #include <iostream>
+    #include <vector>
+
+    int main()
+    {
+        std::vector vec { 1, 2, 3, 4, 5 };
+
+        for (auto index{ std::ssize(vec)-1 }; index >= 0; --index)
+            std::cout << vec[static_cast<std::size_t>(index)] << ' ';
+    }
+    ```
+
+Converting the signed loop variable to an unsigned index
+--------------------------------------------------------
+once we have a signed loop variable, we woul run into wanring for implicit signed to unsigned conversions. so we need ways to curb this. 
+solutions:
+1. using `static_cast` to cast to unsigned where neccessay: works but clutters code.
+2. use a conversion function witha short name.
+    ```cpp
+    #include <iostream>
+    #include <vector>
+
+    using Index = std::ptrdiff_t;
+
+    constexpr std::size_t getU( Index index )
+    {
+        return static_cast<std::size_t>(index)
+    }
+
+    int main()
+    {
+        std::vector vec {1, 2, 4, 5, 6, 7};
+        
+        auto len { static_cast<Index>(vec.size()) };
+        for(Index index { len-1 }; index >= 0; --index)
+            std::cout << vec[getU(index)];
+    }
+    ```
+3. creats a custome view for arrays that do exactly what you want.  
+    our custom array wsuld be able to do this 2 to any container that supports indexing
+    1. retrieve the element of an array.
+    2. return the size of an array.
+
+    array_view.h:
+    ```cpp
+    #ifndef CUSTOM_ARRAY_VIEW
+    #define CUSTOM_ARRAY_VIEW
+
+    template <typename T>
+    class s_array_view
+    {
+    private:
+        T& m_array;
+
+    public:
+        using Index = std::ptrdiff_t;
+
+        s_array_view(T& array) : m_array { array } {}
+
+        constexpr auto& operator[](Index index) {
+            return m_array[static_cast<typename T::size_type>(index)];
+        }
+        constexpr const auto& operator[](Index index) const {
+            return m_array[static_cast<typename T::size_type>(index)];
+        }
+        constexpr auto ssize() {
+            return static_cast<Index>(m_array.size());
+        }
+    };
+    #endif
+    ```
+
+    main.cpp:
+    ```cpp
+    #include <iostream>
+    #include <vector>
+    #include "array_view.h"
+    
+    int main()
+    {
+        std::vector array { 1, 2, 3, 4, 5, 6 };
+        s_array_view sv_array { array };
+
+        for (auto index { sv_array.ssize()-1 }; index >= 0; --index)
+            std::cout << sv_array[index] << ' ';
+    }
+    ```
+
+The only sane choice: avoid indexing altogether!
+------------------------------------------------
+all options presented here has their own downsides. so its difficult to recommend a best practice.
+however theres a choice far more sane than the others: avoid indexing with integral values altogether.
+
+this can be done using for-each loops or iterators. they will be discussed later.
+and we should use them than interacting with intergral values for traversals whenever possible (*best practice*).
+
+
+Range-based for loops (for-each)
+================================
+altho forloops provide in interface for traversing through a container, they often lead to one-off errors, easy to mess up and are subjected to array indexing sign problems.
+because traversing forward in an array is such a common thing to do c++ provides for loop called the `ranged based` for loop. which helps iteration and traversion of a container without
+explicit indexing.
+
+ranged based forloops are simpler, safer and work with all common array types in c++ including std::vector, std::array and c-style arrays.
+
+Range-based for loops
+---------------------
+syntax:
+```cpp
+for (element_declaration : array_object)
+`   statement;`
+```
+
+when a range based loop is encountered, the loop is traversed and assigns the current iterated upon element to the element_declaration, then the statement is executed.
+for best result element_declaration should have the same type as the elements in the array or else type conversion will occur.
+
+an example:
+```cpp
+#include <iostream>
+#include <vector>
+
+int main()
+{
+    std::vector fibonacci { 0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89 };
+
+    for (int num : fibonacci)
+        std::cout << num << ' ';
+    std::cout << '\n';
+}
+```
+becuase num is assigned the value of the elements of the array, through copy assignment this can be quite expensive for some datatypes.
+
+Range-based for loops and type deduction using the auto keyword
+---------------------------------------------------------------
+because element_declaration should be of the same data-type as the elements in the array to be traversed. this is an ideal case to use the `auto` keyword
+for type deduction of the element.
+an example:
+```cpp
+#include <vector>
+#include <iostream>
+
+int main()
+{
+    std::vector array { 1, 2, 3, 4, 5, 6 };
+
+    for (auto num : array)
+        std::cout << num;
+}
+```
+this is a best practice.
+
+Avoid element copies by using references
+----------------------------------------
+copying some elements in an array can be expensive so we can assign them to references thereby circumventing the problem of the making expensive copies.
+```cpp
+#include <vector>
+#include <iostream>
+#include <string>
+
+int main()
+{   
+    using namespace std::literals;
+    std::vector words{ "peter"s, "likes"s, "frozen"s, "yogurt"s };
+
+    for (const auto& word : words)
+        std::cout << word << ' ';
+    std::cout << '\n';
+}
+```
+if the element_declaration is made non-const we will be able to modify the elements of the array( something not possible if our element declaration is a copy of the value ).
+
+Consider always using const auto& when you don’t want to work with copies of elements
+-------------------------------------------------------------------------------------
+normaly we use:
+* `auto`        : for cheap to copy elements
+* `const auto&` : for elements that are expensive to copy and we require only read access to them.
+* `auto&`       : for elements that are expensive to copy but we desire both read and write access to them.
+
+case where using auto can be acceptable:
+```cpp
+using namespace std::literals;
+std::vector words{ "peter"sv, "likes"sv, "frozen"sv, "yogurt"sv };          // sv is a literal suffix string_views.
+
+for (auto word : word)  // the auto keyword is fine here only becuase the type deduces to a string_view that acts as an inexpensive view for strings (just like a reference but only for strings).
+    std::cout << word;
+```
+for expensive to copy elements like strings: a string_view, `const auto&` or `auto&` are more memory conservative.
+
+ranged based for loops dont work on decayed C-style arrays (whatever the fuckk that is).
+
+Getting the index of the current element
+----------------------------------------
+ranged based forloops dont provide an interface to access the index of the elements it traverses over. but this issue can be resolved by creating you own personal counter.
+
+Range-based for loops in reverse : `c++20`
+--------------------------------
+range based for loops only traverse in a forwaed order, hover there are cases where we might want to traverses an array in a reverse order.
+in c++20 we can use the `std::views::reverse` of the `<ranges>` library to create a reverse view of the elements to be traveresed.
+an example:
+```cpp
+#include <iostream>
+#include <vector>
+#include <ranges>   // c++20
+#include <string_view>
+
+int main()
+{
+    using namespace std::literals;
+    std::vector words{ "Alex"sv, "Bobby"sv, "Chad"sv, "Dave"sv };
+
+    for (const auto& word : std::views::reverse(words))
+        std::cout << word;
+}
+```
+
+
+Array indexing and length using enumerators
+===========================================
+one of the biggest flaws of array indexing is that the subscript tells us nothing about the index or the element to be retreived.
+
+using unscoped enumerators for indexing
+---------------------------------------
+subscipts of caintainers like `std::vector` and its likes have thier type as `conatainer::size_type` which is usually an alias for `std::size_t`.
+and since unscoped enumarations will implicitly convert to `std::size_t` we can use the for indexing to help document the meaning of an index.
+```cpp
+#include <vector>
+
+namsepace Students
+{
+    enum Names
+    {
+        toby,
+        dwight,
+        jan,
+        micheal,
+        creed,
+        kevin,
+        max_employees
+    };
+}
+
+int main()
+{
+    std::vector scores { 22, 333, 455, 666, 88, 999 };
+    scores[Students::toby] = 100;                                           // here were updating the score of student toby.
+}
+```
+becuase enumerations are implicitly constexpr, conversion of an enumerator to an unsigned integral type is not considered a narrow conversion, thus avoiding
+signed/unsigned indexing problems.
+
+Using a non-constexpr unscoped enumeration for indexing
+-------------------------------------------------------
+the underlying type of enumarators are implamantaion defined (so they could be either signed or unsigned). and because they are implicitly constexpr we wont run into
+any warings when using them to index arrays directly (this is because constexprs do not narrow convert if they are used in a context that can work but might narrow convert for normal
+variables types: I suspect this is due to compiler optimizations for compile time variables like contexprs).
+
+so we experience no narrow conversion warnings when used directly but we might experience if the enumartor is made non-constexpr:
+an example:
+```cpp
+#include <vector>
+
+namsepace DunderMifflin
+{
+    enum Scranton
+    {
+        toby,
+        dwight,
+        jan,
+        micheal,
+        creed,
+        kevin,
+        max_employees
+    };
+}
+
+int main()
+{
+    std::vector workScores {7, 9 ,9, 5, 6, 7};
+    DunderMifflin::Scraton boss { DunderMifflin::micheal };         // non-constexpr
+
+    workScores[boss] = 10;                                          // poosible narrow conversion warning becase boss is now a non constexpr enumerator,
+                                                                    // and might default to a signed undertlying type.
+}
+```
+we can fix this by specifying the underlying type of the enumarations.
+an example:
+```cpp
+#include <vector>
+
+namsepace DunderMifflin
+{
+    enum Scranton : unsigned int    // specified.
+    {
+        toby,
+        dwight,
+        jan,
+        micheal,
+        creed,
+        kevin,
+        max_employees
+    };
+}
+
+int main()
+{
+    std::vector workScores {7, 9 ,9, 5, 6, 7};
+    DunderMifflin::Scraton boss { DunderMifflin::micheal };         // non-constexpr but unsigned,
+
+    workScores[boss] = 10;                                          // sign conversion does not occur since unigned int can be converted to std::size_t with no issues
+                                                                    // i think that integral promotion?
+}
+```
+
+Using a count enumerator
+------------------------
+if you notice we've been adding the enumaration `max_employees` as the last enumerator to all our enumarators. if all proior enumerators of the enumaration are using thier
+default values this means that the `max_employees` enumerator should hold length value or count value of the valid enumerators.
+we call this the `count enumerator` as it represnts the count of the prior enumarators:
+an example:
+```cpp
+#include <vector>
+
+namsepace DunderMifflin
+{
+    enum Scranton : unsigned int    // specified.
+    {
+        toby,
+        dwight,
+        jan,
+        micheal,
+        creed,
+        kevin,
+        max_employees
+    };
+}
+
+int main()
+{
+    std::vector<int> scores (DunderMifflin::max_employees);         // create a vector that holds 5 elements.
+    scores[DunderMifflin::kevin] = 78;                              // updating the score that belongs to kevin.
+    std::cout << DunderMifflin::max_employees << '\n';              // here its used to prints the length of the scores or how many employees there are.
+}
+```
+this technique is nice because if an enumerator should get larger we have the nice interface for adding new enumerators and the length is automatically updated
+as long as any new enumerator is declared before the count enumerator making it always last to hold the count.
+
+Asserting on array length with a count enumerator
+-------------------------------------------------
+this is useful for always making sure that the enumaration count enumerator is of the right value: which should be equal to the size of the vector it acts as an indexer for.
+an example:
+```cpp
+#include <cassert>
+#include <iostream>
+#include <vector>
+
+enum StudentNames
+{
+    kenny, // 0
+    kyle, // 1
+    stan, // 2
+    butters, // 3
+    cartman, // 4
+    max_students // 5
+};
+
+int main()
+{
+    std::vector socres { 1, 2, 7, 4, 5, 6, 7, 8 };
+
+    assert(std::size(scores) == max_students);
+    // proceed to interact with array using its mapped unscoped enumerations interface for indexing.
+}
+```
+use `static_assert` if your array is constexpr, vectors do not support constexprs but `std::array` does.
+
+Arrays and enum classes
+-----------------------
+because unsscped enumerators pollute the scope they are declared, we can opt to use the scoped enumarators: `enum classes`
+but they do not support implicity conversions to their underlying types and becuase of this might run into issues when trying to 
+use thier enumerators as array indices.
+```cpp
+#include <vector>
+#include <iostream>
+
+
+enum class StudentNames // now an enum class
+{
+    kenny, // 0
+    kyle, // 1
+    stan, // 2
+    butters, // 3
+    cartman, // 4
+    max_students // 5
+};
+
+int main()
+{
+    std::vectors<int> students ( static_cast<int>(StudentNames::max_students) );
+
+    students[static_cast<size_t>(StudentNames::stan)] = 33;
+    std::cout << static_cast<int>(StudentNames::max_student) << '\n';
+}
+```
+although this works in eradictaing the pollution of the current scope problem, it also introdeuces some new ones:
+1. a pain to write, clutters code alot due to the need to specify the namespace.
+2. a lot of static_cast which leads to more clutters
+3. due to all the wring might lead to errors.
+
+we can fix this though by overloading the `operator+`:
+```cpp
+#include <vector>
+#include <iostream>
+
+enum class StudentNames // now an enum class
+{
+    kenny, // 0
+    kyle, // 1
+    stan, // 2
+    butters, // 3
+    cartman, // 4
+    max_students // 5
+};
+
+constexpr auto operator+(StudentNames a) noexcept {
+    return static_cast<std::underlying_type_t<StudentNames>>(a);
+}
+
+int main()
+{
+    std::vector<int> students (+StudentNames::max_students);
+
+    students[static_cast<size_t>(StudentNames::stan)] = 33;
+    std::cout << +StudentNames::max_students << '\n';
+}
+```
+
+
+std::vector resizing and capacity
+=================================
+in this subtopic we are focusing on what makes `std::vector` significantly different than other array types: the ability to resize itself after being instantiated.
+
+Fixed-size arrays vs dynamic arrays
+-----------------------------------
+most arrays have a limitation that is the size should be known at the point of instantiation and then cannot be changed. such arrays are called `fized-size arrays`.
+both `std::array` and `C Style arrays` are fixed lengthed.
+
+on the other hand std::vector is a `dynamic array`. a dynamic array is an a rray whose size can be changed after instantiation. the abilty to be resizable
+is what makes `std::vector` special.
+
+Resizing a std::vector at runtime
+---------------------------------
+this is done by calling the `.resize()` with the size as the argument.
+an example:
+```cpp
+#include <vector>
+#include <iostream>
+
+int main()
+{
+    std::vector vec { 1, 2, 4 };
+    std::cout << "the length is: " << vec.size() << '\n';
+
+    vec.resize(5);
+    std::cout << "the length is: " << vec.size() << '\n';
+
+    for (auto i : vec)
+        std::cout << i << ' ';
+    std::cout << '\n';
+}
+```
+this prints
+```bash
+the length is: 3
+the length is: 5
+1 2 4 0 0
+```
+vectors can alos be reiszed to be smaller: it preserves the first occuring elements and discards the later elements to fit the new size.
+
+The length vs capacity of a std::vector
+---------------------------------------
+the length of a vectors is the number of elements in a vector that is considered in use.
+the *capacity* is the number of elements with allocated memory in the vector: it comprises of both in use and not in use elements.
+we can get the capacity of a vector by calling the `.capacity()` function.
+
+Reallocation of storage, and why it is expensive
+------------------------------------------------
+when `std::vector` changes the amount of storage its managing this is known as **reallocation**.
+what happens under the hood when reallocation occurs:
+1. `std::vector` acquires new memory sufficient for the new capacity of elemnst to be catered for
+2. the elements in the old memory gets copied (or moved, if possible) to the newly allocated storage and the old memory gets returned back to the system.
+3. the capacity and length of the `std::vector` object are updated to conform to the new storage.
+
+what happens when reallocation occurs is basically hidden replacement with the old std::vector object being replaced by a new one.
+sounds expensive? thats because it is. we should avoid resizing where possible.
+
+Why differentiate length and capacity?
+--------------------------------------
+basically at a vectors initialization capacity and length are the same.
+when the vector gets expanded (via resizing and reallocation) the capacity and length, although incremented, resolve to be equal.
+but something specaial happens when a vector is shruken.
+
+refer to cpp file           : 
+and run executanles file    :
+to notice the difference of them
+
+something to note (personal findings):
+1. once the capacity of a vector increases it doesnt reduce (implicitly i think)
+2. the length can increase or reduce
+
+tracking capacity seperately from length allows `std::vector` to avoid reallocations when length is changed.
+
+Vector indexing is based on length, not capacity
+------------------------------------------------
+that makes sense: becuase length leeps track of elements in use.
+why would we want to index for an element that isnt in use?
+
+A subscript is only valid if it is between 0 and the vector’s length (not its capacity)!
+
+Shrinking a std::vector
+-----------------------
+resizing a vector to be larger will increase the vectors length, and will increase the capacity if required. however resizing a vector
+to be smaller will only decrease its length, and not its capacity.
+
+to fis this vectors have a member function `.shrink_to_fit()` that request that the vector shrinks its capacity to match its length
+the requests is non-binding meaning the compiler is free to ignore it.
+an example:
+```cpp
+#include <vector>
+#include <iostream>
+
+void printCapLen(const std::vector<int>& v) 
+{
+    std::cout << "Capacity: " << v.capacity() << " Length:"	<< v.size() << '\n';
+}
+
+int main()
+{
+    std::vector num { 1, 3, 4, 5, 6 };
+    printCapLen(num);
+
+    num.resize(0);
+    printCapLen(num);
+
+    num.shrink_to_fit();
+    printCapLen(num);
+}
+```
+when `shrink_to_fit()` is called the compiler reallocated its capacity to 0: freeing 1000 allocated objects.
+
+std::vector and stack behavior
+==============================
+
+

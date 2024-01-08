@@ -47,3 +47,4 @@ if __name__ == "__main__":
         print("usage python3 script.py file")
     else:
         markdownify(sys.argv[1])
+        
