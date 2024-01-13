@@ -1226,5 +1226,143 @@ when `shrink_to_fit()` is called the compiler reallocated its capacity to 0: fre
 
 std::vector and stack behavior
 ==============================
+in programming a stack is a container in which inertion and removal of elements occur in a LIFO manner. its commonly implemented via two operations
+named **pop** and **push**
+
+Stacks in C++
+-------------
+in c++ stack like operation were added to any container classs that support efficient insertion and removal: therefore conatiner classes like
+`std::vectors`, `std::deque` and `std::list`. this alloes any of this containers to be used as stacks in addition to their native functionalities.
+
+Stack behavior with std::vector
+-------------------------------
+
+| Function name  | Stack Operation | Behaviour                                              | Notes                                                    |
+|:--------------:|:---------------:|:------------------------------------------------------:|:--------------------------------------------------------:|
+| push_back      | Push            | places new element on top of stack                     | adds element to the end of vector                        |
+| pop_back()     | Pop             | Remove element form the top of the stack               | Returns void remeoves elemnts from the end of the vector |
+| back()         | top or peek     | gets the top element from the stack                    | Does not remove item                                     |
+| emplace_back() | Push            | alternate form of push_bacl that can be more efficient | adds element to the end of a vector                      |
+
+an example of stack functions implementations with vectors:
+```cpp
+#include <vector>
+#include <iostream>
+
+void print_stack(const std::vector<int>& stack)
+{
+    if (stack.empty())
+        std::cout << "Empty";
+    else
+        for (auto element : stack)
+            std::cout << element << ' ';
+    
+    std::cout << "\tCapacity: " << stack.capacity() << " Length: " << stack.size() << '\n';
+}
+
+int main()
+{
+    std::vector<int> stack{};
+    	printStack(stack);
+
+	stack.push_back(1);
+	printStack(stack);
+
+	stack.push_back(2);
+	printStack(stack);
+
+	stack.push_back(3);
+	printStack(stack);
+
+	std::cout << "Top: " << stack.back() << '\n'; // back() returns the last element
+
+	stack.pop_back(); // pop_back() pops an element off the stack
+	printStack(stack);
+
+	stack.pop_back();
+	printStack(stack);
+
+	stack.pop_back();
+	printStack(stack);
+}
+```
+unlike the `operator[]`  or the `at()` member function, `push_back()` and `emplace_back()` will increment the length of the vector, and will
+cause reallocation to occur if the capacity is not enough
+
+Extra capacity from pushing
+--------------------------
+sometimes when the push_back or emplace_back() is called, the pushing sometimes trigger the vector to allocate more than a single extra memory to prevert
+reallocation in the event that more than one more elements needs to be pushed.
+
+how many extra capacity is left for the compilers implementaion of std::vector and different compilers do different things.
+
+Resizing a vector doesn’t work with stack behavior
+--------------------------------------------------
+initializing a vector with paranthesis initialization, as we all know, sets the capacity of the vector, but what we might not know is that 
+it also sets the length of the vector.
+
+the paranthesis initialization and `resize()` member function in vectors set both the capacity and length of the vector.
+
+The reserve() member function changes the capacity (but not the length)
+-----------------------------------------------------------------------
+the `reserve()` member function changes the capacity but not the length of a vector which fixes some of the issues the `resize()` memeber function
+posses. it reallocates the vectors capacity without altering the length.
+
+so in scenerios where the capacity of the vector has been thought of right before hand, the `reserve()` function can be used to set it and prevent
+realloctions.
+
+key insight
+-----------
+1. the `reserve()`  :    changes the capacity of the vector only (if necessary)
+2. the `resize()`   :    changed the length of the vector and the capacity (if necessary)
+
+push_back() vs emplace_back()
+-----------------------------
+both the `push_back()` and `emplace_back()` functions push elements ontop of the stack. if the object to be pushed already exists
+they are both equivalent in perfomamce. but in cases where we are creating a temporary object for the purpose of puhing it onto the vector
+`emplace_back()` can be more efficient.
+an illustation:
+```cpp
+#include <vector>
+#include <iostream>
+#include <string>
+
+struct Foo
+{
+    std::string a {};
+    int b {};
+};
+
+int main()
+{
+    std::vector<Foo> stack {};
+
+    Foo f { "a", 2 };
+    // when the element to be pushed already exists push_back and emplace_back are basically the same.
+    stack.push_back( f );
+    stack.emplace_back( f );
+    
+    // but when a temporary object is to be pushed emplace_back() is more efficient because:
+    // unlike push_back that relies on copy semamntics to create a new vector and pushes that onto the stack
+    stack.push_back( {"a", 3} );
+    // emplace_back takes the parameters of the elemnets to be pushes onto the stack uses that and initializes the elemnt and pushes that ontop the stack
+    // without copy semantics.
+    stack.emplace_back("a", 2);
+};
+```
+emplace_back uses perfect forwarding to initialize elements from a temporary object to push. perfect forwarding performs no copying.
+prior to c++20 emplace_back does not work with aggregate initialization so the above example only compiles in c++20
+
+Addressing our challenge using stack operations
+-----------------------------------------------
+refer to cpp file   :   [file](test_stack_list.cpp)
 
 
+std::vector`<bool>` 
+==================
+avoid it 
+read about it here  :   [link to learncpp page](https://www.learncpp.com/cpp-tutorial/stdvector-bool)
+
+best practice
+-------------
+Favor constexpr std::bitset, std::vector`<char>`, or 3rd party dynamic bitsets over std::vector`<bool>`.

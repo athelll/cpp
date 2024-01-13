@@ -177,7 +177,7 @@ Putting class definitions in a header file
 ------------------------------------------
 read here
 
-Doesn’t defining a class in a header file violate the one-definition rule if the header is #included more than once?
+Doesn’t defining a class in a header file violate the one-definition rule if the header is included more than once?
 --------------------------------------------------------------------------------------------------------------------
 no it doesnt it: Types are expempted from the ODR(ule). just use header guards.
 functiond defiend inside a class declaration are implicitly inline which allows them tonbe included in multiple files without violating the ODR.

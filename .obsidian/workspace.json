@@ -1,0 +1,167 @@
+{
+  "main": {
+    "id": "4dad797adf3d6d58",
+    "type": "split",
+    "children": [
+      {
+        "id": "b3c5af5b49212011",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "d2b18d48c8ede1a1",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "16.DYNAMIC_ARR_VECTORS/README.md",
+                "mode": "preview",
+                "source": false
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "26a0d89c17b8714d",
+    "type": "split",
+    "children": [
+      {
+        "id": "f9371fe110aae063",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "6ded5820d8beafe2",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "571711b7615a3211",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "8b1c76dab73c287b",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {}
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "right": {
+    "id": "ab66c65befcc785a",
+    "type": "split",
+    "children": [
+      {
+        "id": "ec653068e95942e6",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "7e192c438e29eb2a",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "16.DYNAMIC_ARR_VECTORS/README.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "f0ae4ce88bcd1491",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "16.DYNAMIC_ARR_VECTORS/README.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "eac74926c55ad802",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true
+              }
+            }
+          },
+          {
+            "id": "bde724959425f9db",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "16.DYNAMIC_ARR_VECTORS/README.md"
+              }
+            }
+          }
+        ],
+        "currentTab": 3
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false
+    }
+  },
+  "active": "d2b18d48c8ede1a1",
+  "lastOpenFiles": [
+    "17.FIXED_SIZE_ARR/README.md",
+    "17.FIXED_SIZE_ARR",
+    "07.SCOPE_DURA_LINKAGE/README.md",
+    "16.DYNAMIC_ARR_VECTORS/README.md",
+    "16.DYNAMIC_ARR_VECTORS/test_list_stack",
+    "16.DYNAMIC_ARR_VECTORS/test_stack_list.cpp",
+    "16.DYNAMIC_ARR_VECTORS/test_emplace_back",
+    "16.DYNAMIC_ARR_VECTORS/test_emplace_back.cpp",
+    "16.DYNAMIC_ARR_VECTORS/README.pdf",
+    "16.DYNAMIC_ARR_VECTORS/4913",
+    "16.DYNAMIC_ARR_VECTORS/Dynamic arrays vectors.md",
+    "15.CLASSES_++/README.md",
+    "14.CLASSES/morbious.png",
+    "16.DYNAMIC_ARR_VECTORS/why-subscripts-should-be-signed.pdf"
+  ]
+}
